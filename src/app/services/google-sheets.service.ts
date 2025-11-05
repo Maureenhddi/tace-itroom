@@ -3,35 +3,14 @@ import { Observable, from } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { gapi } from 'gapi-script';
+import {
+  TokenResponse,
+  TokenClient,
+  GoogleSheetsMetadata,
+  GoogleSheet
+} from '../models/google-api.types';
 
-declare const google: any;
-
-interface TokenResponse {
-  access_token: string;
-  expires_in?: number;
-  error?: string;
-}
-
-interface TokenClient {
-  callback: (response: TokenResponse) => void;
-  requestAccessToken: (options: { prompt: string }) => void;
-}
-
-interface SheetsResponse {
-  result: {
-    values?: (string | number)[][];
-    valueRanges?: Array<{
-      values: (string | number)[][];
-      range: string;
-    }>;
-    sheets?: Array<{
-      properties: {
-        sheetId: number;
-        title: string;
-      };
-    }>;
-  };
-}
+declare const google: Window['google'];
 
 @Injectable({
   providedIn: 'root'
@@ -109,7 +88,7 @@ export class GoogleSheetsService {
             this.tokenClient = google.accounts.oauth2.initTokenClient({
               client_id: environment.googleApi.clientId,
               scope: environment.googleApi.scopes,
-              callback: (response: any) => {
+              callback: (response: TokenResponse) => {
                 if (response.error !== undefined) {
                   return;
                 }
@@ -214,11 +193,17 @@ export class GoogleSheetsService {
       throw new Error('User not signed in');
     }
 
+    interface GapiSheetsResponse {
+      result: {
+        values?: (string | number)[][];
+      };
+    }
+
     const promise: Promise<(string | number)[][]> = (gapi.client as any).sheets.spreadsheets.values.get({
       spreadsheetId: spreadsheetId,
       range: range,
       valueRenderOption: 'UNFORMATTED_VALUE'
-    }).then((response: SheetsResponse): (string | number)[][] => {
+    }).then((response: GapiSheetsResponse): (string | number)[][] => {
       return response.result.values || [];
     });
 
@@ -230,7 +215,7 @@ export class GoogleSheetsService {
    * @param spreadsheetId - The ID of the spreadsheet
    * @param ranges - Array of ranges in A1 notation
    */
-  getMultipleRanges(spreadsheetId: string, ranges: string[]): Observable<any> {
+  getMultipleRanges(spreadsheetId: string, ranges: string[]): Observable<Array<{values: (string | number)[][], range: string}>> {
     if (!this.gapiInitialized) {
       throw new Error('Google API client not initialized');
     }
@@ -239,21 +224,27 @@ export class GoogleSheetsService {
       throw new Error('User not signed in');
     }
 
-    return from(
-      (gapi.client as any).sheets.spreadsheets.values.batchGet({
-        spreadsheetId: spreadsheetId,
-        ranges: ranges
-      }).then((response: any) => {
-        return response.result.valueRanges;
-      })
-    );
+    interface GapiBatchGetResponse {
+      result: {
+        valueRanges: Array<{values: (string | number)[][], range: string}>;
+      };
+    }
+
+    const promise: Promise<Array<{values: (string | number)[][], range: string}>> = (gapi.client as any).sheets.spreadsheets.values.batchGet({
+      spreadsheetId: spreadsheetId,
+      ranges: ranges
+    }).then((response: GapiBatchGetResponse) => {
+      return response.result.valueRanges;
+    });
+
+    return from(promise);
   }
 
   /**
    * Get spreadsheet metadata
    * @param spreadsheetId - The ID of the spreadsheet
    */
-  getSpreadsheetMetadata(spreadsheetId: string): Observable<any> {
+  getSpreadsheetMetadata(spreadsheetId: string): Observable<GoogleSheetsMetadata> {
     if (!this.gapiInitialized) {
       throw new Error('Google API client not initialized');
     }
@@ -262,13 +253,17 @@ export class GoogleSheetsService {
       throw new Error('User not signed in');
     }
 
-    return from(
-      (gapi.client as any).sheets.spreadsheets.get({
-        spreadsheetId: spreadsheetId
-      }).then((response: any) => {
-        return response.result;
-      })
-    );
+    interface GapiMetadataResponse {
+      result: GoogleSheetsMetadata;
+    }
+
+    const promise: Promise<GoogleSheetsMetadata> = (gapi.client as any).sheets.spreadsheets.get({
+      spreadsheetId: spreadsheetId
+    }).then((response: GapiMetadataResponse) => {
+      return response.result;
+    });
+
+    return from(promise);
   }
 
   /**
@@ -277,12 +272,12 @@ export class GoogleSheetsService {
    */
   getSheetNames(spreadsheetId: string): Observable<string[]> {
     return this.getSpreadsheetMetadata(spreadsheetId).pipe(
-      map((metadata: any) => {
+      map((metadata: GoogleSheetsMetadata) => {
         if (metadata.sheets) {
           // Filtrer les onglets masqués (hidden: true) et ne retourner que les onglets visibles
           return metadata.sheets
-            .filter((sheet: any) => !sheet.properties.hidden)
-            .map((sheet: any) => sheet.properties.title);
+            .filter(sheet => !sheet.properties.hidden)
+            .map(sheet => sheet.properties.title);
         }
         return [];
       })

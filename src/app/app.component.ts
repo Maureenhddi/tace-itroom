@@ -14,13 +14,7 @@ import { ActivityChartComponent } from './components/activity-chart/activity-cha
 import { DashboardSummaryComponent, MonthlySummary } from './components/dashboard-summary/dashboard-summary.component';
 import { Observable, forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
-
-interface TableRow {
-  [key: string]: string | number | boolean | undefined;
-  isCustomRow?: boolean;
-  isSubRow?: boolean;
-  isTitleRow?: boolean;
-}
+import { TableRow } from './models/table-data.types';
 
 interface MonthlyMetrics {
   month: string;

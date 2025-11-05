@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
+import { TableRow, CellValue } from '../../models/table-data.types';
 
 @Component({
   selector: 'app-data-table',
@@ -15,9 +16,9 @@ import { MatCardModule } from '@angular/material/card';
   styleUrl: './data-table.component.scss'
 })
 export class DataTableComponent {
-  @Input() data: any[] = [];
+  @Input() data: TableRow[] = [];
   @Input() displayedColumns: string[] = [];
-  @Input() headers: any[] = [];
+  @Input() headers: string[] = [];
   @Input() loading: boolean = false;
 
   /**
@@ -32,7 +33,7 @@ export class DataTableComponent {
   /**
    * Vérifie si une cellule contient un taux d'activité réel (un pourcentage)
    */
-  isActivityRate(value: any): boolean {
+  isActivityRate(value: CellValue): boolean {
     if (typeof value !== 'string' && typeof value !== 'number') return false;
     const strValue = String(value).trim();
     // Vérifie si c'est un nombre avec ou sans le symbole % (avec ou sans espace)
@@ -45,7 +46,7 @@ export class DataTableComponent {
    * - average: 70% - 84%
    * - low: < 70%
    */
-  getRateClass(value: any): string {
+  getRateClass(value: CellValue): string {
     if (!this.isActivityRate(value)) return '';
 
     const numValue = parseFloat(String(value).replace('%', ''));

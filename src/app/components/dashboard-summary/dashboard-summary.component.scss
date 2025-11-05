@@ -1,0 +1,234 @@
+// IT-Room colors
+$itroom-blue: #2c5f8d;
+$itroom-blue-light: #4a8ec4;
+$itroom-orange: #f59c16;
+$itroom-green: #28a745;
+$itroom-text: #4c4c4c;
+$itroom-text-dark: #333;
+$itroom-bg: #fff;
+$itroom-bg-muted: #f8f9fa;
+$itroom-border: #e5e5e5;
+
+// Status colors
+$status-good: #28a745;
+$status-good-light: #d4edda;
+$status-good-border: #c3e6cb;
+$status-average: #ffc107;
+$status-average-light: #fff3cd;
+$status-average-border: #ffeaa7;
+$status-low: #dc3545;
+$status-low-light: #f8d7da;
+$status-low-border: #f5c6cb;
+
+// Dark mode colors
+$dark-bg: #0f1419;
+$dark-card-bg: #1a1f26;
+$dark-text: #e0e0e0;
+$dark-border: #2d3748;
+$dark-shadow: rgba(0, 0, 0, 0.5);
+
+.dashboard-container {
+  padding: 2rem;
+}
+
+.dashboard-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: $itroom-text-dark;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.month-card {
+  background: $itroom-bg;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  ::ng-deep {
+    .mat-mdc-card-header {
+      background: linear-gradient(135deg, $itroom-blue 0%, $itroom-blue-light 100%);
+      padding: 1.5rem;
+      border-radius: 12px 12px 0 0 !important;
+    }
+
+    .mat-mdc-card-title {
+      color: white;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .mat-mdc-card-content {
+      padding: 1.5rem !important;
+    }
+  }
+}
+
+.metric-section {
+  margin-bottom: 1.5rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: $itroom-text;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid $itroom-border;
+}
+
+.metrics-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  border-radius: 8px;
+  background: $itroom-bg-muted;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &.team-front {
+    border-color: $itroom-blue;
+    background: linear-gradient(135deg, rgba($itroom-blue, 0.05) 0%, rgba($itroom-blue, 0.1) 100%);
+  }
+
+  &.team-back {
+    border-color: $itroom-orange;
+    background: linear-gradient(135deg, rgba($itroom-orange, 0.05) 0%, rgba($itroom-orange, 0.1) 100%);
+  }
+
+  &.expertise-ecommerce {
+    border-color: $itroom-blue;
+    background: linear-gradient(135deg, rgba($itroom-blue, 0.05) 0%, rgba($itroom-blue, 0.1) 100%);
+  }
+
+  &.expertise-surmesure {
+    border-color: $itroom-orange;
+    background: linear-gradient(135deg, rgba($itroom-orange, 0.05) 0%, rgba($itroom-orange, 0.1) 100%);
+  }
+
+  // Status color classes
+  &.rate-good {
+    border-color: $status-good !important;
+    background: linear-gradient(135deg, $status-good-light 0%, rgba($status-good, 0.15) 100%) !important;
+  }
+
+  &.rate-average {
+    border-color: $status-average !important;
+    background: linear-gradient(135deg, $status-average-light 0%, rgba($status-average, 0.15) 100%) !important;
+  }
+
+  &.rate-low {
+    border-color: $status-low !important;
+    background: linear-gradient(135deg, $status-low-light 0%, rgba($status-low, 0.15) 100%) !important;
+  }
+}
+
+.metric-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: $itroom-text;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.metric-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: $itroom-text-dark;
+}
+
+// Dark theme
+::ng-deep body.dark-theme {
+  .dashboard-title {
+    color: $dark-text;
+  }
+
+  .month-card {
+    background: $dark-card-bg !important;
+    box-shadow: 0 4px 16px $dark-shadow !important;
+
+    &:hover {
+      box-shadow: 0 8px 24px $dark-shadow !important;
+    }
+  }
+
+  .section-title {
+    color: $dark-text;
+    border-color: $dark-border;
+  }
+
+  .metric-item {
+    background: rgba($dark-bg, 0.5);
+
+    &.team-front,
+    &.expertise-ecommerce {
+      background: linear-gradient(135deg, rgba($itroom-blue, 0.15) 0%, rgba($itroom-blue, 0.25) 100%);
+    }
+
+    &.team-back,
+    &.expertise-surmesure {
+      background: linear-gradient(135deg, rgba($itroom-orange, 0.15) 0%, rgba($itroom-orange, 0.25) 100%);
+    }
+
+    // Status colors in dark mode
+    &.rate-good {
+      border-color: $status-good !important;
+      background: linear-gradient(135deg, rgba($status-good, 0.2) 0%, rgba($status-good, 0.3) 100%) !important;
+    }
+
+    &.rate-average {
+      border-color: $status-average !important;
+      background: linear-gradient(135deg, rgba($status-average, 0.2) 0%, rgba($status-average, 0.3) 100%) !important;
+    }
+
+    &.rate-low {
+      border-color: $status-low !important;
+      background: linear-gradient(135deg, rgba($status-low, 0.2) 0%, rgba($status-low, 0.3) 100%) !important;
+    }
+  }
+
+  .metric-label {
+    color: $dark-text;
+  }
+
+  .metric-value {
+    color: white;
+  }
+}
+
+@media (max-width: 768px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}

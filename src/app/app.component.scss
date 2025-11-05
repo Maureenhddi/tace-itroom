@@ -1,0 +1,484 @@
+// IT-Room exact colors from itroom.fr website
+$itroom-blue: #1e87f0;
+$itroom-blue-hover: #0f6ecd;
+$itroom-dark-blue: #0070af;
+$itroom-orange: #f59c16;
+$itroom-bg: #fff;
+$itroom-bg-muted: #f5f7fa;
+$itroom-text: #4c4c4c;
+$itroom-text-dark: #333;
+$itroom-text-light: #666;
+$itroom-text-lighter: #999;
+$itroom-border: #e5e5e5;
+$itroom-shadow: rgba(0, 0, 0, 0.08);
+
+// Dark mode colors
+$dark-bg: #0f1419;
+$dark-bg-muted: #0a0e13;
+$dark-card-bg: #1a1f26;
+$dark-text: #e0e0e0;
+$dark-text-secondary: #b0b0b0;
+$dark-border: #2d3748;
+$dark-shadow: rgba(0, 0, 0, 0.5);
+
+.container {
+  max-width: 95%;
+  margin: 0 auto;
+  padding: 0;
+  font-family: 'Open Sans', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, $itroom-bg-muted 0%, #e8eef5 100%);
+  transition: background 0.3s ease;
+
+  @media (min-width: 1920px) {
+    max-width: 1800px;
+  }
+}
+
+::ng-deep body.dark-theme .container {
+  background: linear-gradient(135deg, $dark-bg-muted 0%, #0d1117 100%);
+}
+
+// Modern Header
+.header-card {
+  margin: 0;
+  background: linear-gradient(135deg, $itroom-blue 0%, $itroom-dark-blue 100%);
+  color: white;
+  box-shadow: 0 10px 40px rgba($itroom-blue, 0.3);
+  border-radius: 0 !important;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba($itroom-orange, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  ::ng-deep {
+    .mat-mdc-card-header {
+      padding: 2.5rem 3rem 2rem;
+      background: transparent;
+      border-bottom: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mat-mdc-card-title {
+      color: white;
+      font-size: 2.5rem;
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .mat-mdc-card-subtitle {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      font-weight: 400;
+    }
+
+    .mat-mdc-card-content {
+      padding: 0 3rem 2.5rem !important;
+      position: relative;
+      z-index: 1;
+    }
+  }
+}
+
+::ng-deep body.dark-theme .header-card {
+  background: linear-gradient(135deg, #0d4a7a 0%, #063a5e 100%);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+// Header content layout
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+}
+
+.logo-section {
+  .logo {
+    height: 60px;
+    width: auto;
+    display: block;
+    object-fit: contain;
+  }
+
+  .logo-text {
+    font-size: 2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    letter-spacing: 0.5px;
+
+    .logo-it {
+      color: $itroom-blue;
+      text-transform: uppercase;
+    }
+
+    .logo-room {
+      color: $itroom-orange;
+      font-weight: 400;
+    }
+  }
+}
+
+.title-section {
+  flex: 1;
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+
+  button {
+    color: white;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: rotate(15deg) scale(1.05);
+    }
+
+    .material-icons {
+      font-size: 24px;
+      transition: all 0.3s ease;
+    }
+  }
+}
+
+.error-card {
+  margin: 2rem 3rem;
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  color: #c62828;
+  box-shadow: 0 8px 32px rgba(198, 40, 40, 0.2);
+  border-left: 4px solid #c62828;
+  border-radius: 12px !important;
+  animation: slideIn 0.3s ease-out;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(198, 40, 40, 0.25);
+  }
+
+  ::ng-deep .mat-mdc-card-content {
+    padding: 1.5rem 2rem !important;
+
+    p {
+      margin: 0;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+  }
+}
+
+::ng-deep body.dark-theme .error-card {
+  background: linear-gradient(135deg, #5a1f1f 0%, #4a1515 100%);
+  color: #ff6b6b;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.warning-card {
+  margin: 2rem 3rem;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  color: #e65100;
+  box-shadow: 0 8px 32px rgba(230, 81, 0, 0.2);
+  border-left: 4px solid #e65100;
+  border-radius: 12px !important;
+  animation: slideIn 0.3s ease-out;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(230, 81, 0, 0.25);
+  }
+
+  ::ng-deep .mat-mdc-card-content {
+    padding: 1.5rem 2rem !important;
+
+    p {
+      margin: 0;
+      font-weight: 500;
+      font-size: 1rem;
+    }
+  }
+}
+
+::ng-deep body.dark-theme .warning-card {
+  background: linear-gradient(135deg, #5a3f1f 0%, #4a2f0f 100%);
+  color: #ffa726;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Auth section
+.auth-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+
+  p {
+    margin: 0;
+    flex: 1;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  button {
+    margin: 0;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: 8px;
+    padding: 0 32px;
+    height: 44px;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    &.mat-primary {
+      background-color: rgba(255, 255, 255, 0.95);
+      color: $itroom-blue;
+      border-color: transparent;
+
+      &:hover {
+        background-color: white;
+        transform: translateY(-2px);
+      }
+    }
+  }
+}
+
+// Loading
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  gap: 1rem;
+
+  p {
+    margin: 0;
+    color: $itroom-text-light;
+    font-size: 1rem;
+  }
+
+  ::ng-deep .mat-mdc-progress-spinner {
+    --mdc-circular-progress-active-indicator-color: #{$itroom-blue};
+  }
+}
+
+// Tabs container
+.tabs-container {
+  margin: 2rem 3rem;
+
+  ::ng-deep {
+    .mat-mdc-tab-group {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba($itroom-blue, 0.12);
+      border-radius: 16px;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .mat-mdc-tab-header {
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.95));
+      border-bottom: 1px solid rgba($itroom-blue, 0.1);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .mat-mdc-tab-labels {
+      background: transparent;
+      transition: all 0.3s ease;
+    }
+
+    .mat-mdc-tab {
+      color: $itroom-text;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.875rem;
+      letter-spacing: 0.8px;
+      min-width: 160px;
+      opacity: 0.7;
+      transition: all 0.3s ease;
+
+      &.mdc-tab--active {
+        color: $itroom-blue;
+        opacity: 1;
+      }
+
+      &:hover {
+        background-color: rgba($itroom-blue, 0.05);
+        opacity: 1;
+      }
+    }
+
+    .mdc-tab-indicator__content--underline {
+      border-color: $itroom-blue;
+      border-width: 3px;
+      border-radius: 3px 3px 0 0;
+    }
+
+    .mat-mdc-tab-body-content {
+      padding: 0;
+    }
+  }
+}
+
+// Sous-onglets (mois)
+.sub-tabs-container {
+  margin: 1rem;
+
+  ::ng-deep {
+    .mat-mdc-tab-group {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .mat-mdc-tab-header {
+      background: linear-gradient(to right, rgba($itroom-blue, 0.03), rgba($itroom-orange, 0.03));
+      border-bottom: 1px solid rgba($itroom-blue, 0.15);
+      border-radius: 8px 8px 0 0;
+      margin-bottom: 1rem;
+    }
+
+    .mat-mdc-tab {
+      font-size: 0.85rem;
+      font-weight: 500;
+      min-width: 120px;
+      opacity: 0.6;
+
+      &.mdc-tab--active {
+        opacity: 1;
+        font-weight: 600;
+      }
+    }
+
+    .mdc-tab-indicator__content--underline {
+      border-width: 2px;
+      border-color: $itroom-orange;
+    }
+  }
+}
+
+// Charts section
+.charts-section {
+  margin: 2rem 1rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+
+  // Premier graphique prend toute la largeur
+  app-activity-chart:first-child {
+    grid-column: 1;
+  }
+
+  // Deux autres graphiques côte à côte sur la deuxième ligne
+  @media (min-width: 1200px) {
+    grid-template-columns: 1fr 1fr;
+
+    app-activity-chart:first-child {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+::ng-deep body.dark-theme .tabs-container {
+  .mat-mdc-tab-group {
+    background: rgba($dark-card-bg, 0.95);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  .mat-mdc-tab-header {
+    background: linear-gradient(to bottom, rgba($dark-card-bg, 0.8), rgba($dark-card-bg, 0.95));
+    border-bottom: 1px solid rgba($itroom-blue, 0.2);
+  }
+
+  .mat-mdc-tab-labels {
+    background: transparent;
+  }
+
+  .mat-mdc-tab {
+    color: $dark-text-secondary;
+
+    &.mdc-tab--active {
+      color: $itroom-blue;
+    }
+
+    &:hover {
+      background-color: rgba($itroom-blue, 0.15);
+    }
+  }
+}
+
+// Material overrides
+::ng-deep {
+  .mat-mdc-card {
+    border-radius: 4px !important;
+  }
+
+  .mat-mdc-raised-button {
+    &.mat-primary {
+      background-color: $itroom-blue;
+
+      &:hover {
+        background-color: $itroom-blue-hover;
+      }
+    }
+
+    &.mat-accent {
+      border: 1px solid $itroom-border;
+      background-color: transparent;
+      color: $itroom-text-dark;
+
+      &:hover {
+        background-color: $itroom-bg-muted;
+      }
+    }
+  }
+}

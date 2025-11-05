@@ -1,0 +1,22 @@
+@if (!loading && displayedColumns.length > 0) {
+  <mat-card class="table-card">
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="data" class="mat-elevation-z8">
+          @for (column of displayedColumns; track column) {
+            <ng-container [matColumnDef]="column">
+              <th mat-header-cell *matHeaderCellDef>{{ getColumnHeader(column) }}</th>
+              <td mat-cell *matCellDef="let element" [ngClass]="isActivityRateColumn(column) ? getRateClass(element[column]) : ''">{{ element[column] }}</td>
+            </ng-container>
+          }
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+              [class.custom-row]="row.isCustomRow"
+              [class.sub-row]="row.isSubRow"
+              [class.title-row]="row.isTitleRow"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+}

@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  tace-itroom:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+    container_name: tace-itroom
+    restart: unless-stopped
+    networks:
+      - traefik
+    labels:
+      # Enable Traefik for this service
+      - "traefik.enable=true"
+
+      # HTTP Router
+      - "traefik.http.routers.tace-itroom.rule=Host(`your-domain.com`)"
+      - "traefik.http.routers.tace-itroom.entrypoints=web"
+
+      # HTTPS Router (with SSL)
+      - "traefik.http.routers.tace-itroom-secure.rule=Host(`your-domain.com`)"
+      - "traefik.http.routers.tace-itroom-secure.entrypoints=websecure"
+      - "traefik.http.routers.tace-itroom-secure.tls=true"
+      - "traefik.http.routers.tace-itroom-secure.tls.certresolver=letsencrypt"
+
+      # Middleware: Redirect HTTP to HTTPS
+      - "traefik.http.middlewares.tace-itroom-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.tace-itroom-redirect.redirectscheme.permanent=true"
+      - "traefik.http.routers.tace-itroom.middlewares=tace-itroom-redirect"
+
+      # Service configuration
+      - "traefik.http.services.tace-itroom.loadbalancer.server.port=80"
+
+      # Optional: Add security headers
+      - "traefik.http.middlewares.tace-itroom-headers.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow"
+      - "traefik.http.middlewares.tace-itroom-headers.headers.sslRedirect=true"
+      - "traefik.http.middlewares.tace-itroom-headers.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.tace-itroom-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.tace-itroom-headers.headers.stsPreload=true"
+
+networks:
+  traefik:
+    external: true

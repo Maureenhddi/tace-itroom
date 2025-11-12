@@ -7,4 +7,17 @@
       [type]="lineChartType">
     </canvas>
   </div>
+
+  @if (insights.length > 0) {
+    <div class="insights-container">
+      <div class="insights-icon">
+        <span class="material-icons">lightbulb</span>
+      </div>
+      <div class="insights-list">
+        @for (insight of insights; track $index) {
+          <p class="insight-item">{{ insight }}</p>
+        }
+      </div>
+    </div>
+  }
 </div>

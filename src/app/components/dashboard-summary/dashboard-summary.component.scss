@@ -83,6 +83,44 @@ $dark-shadow: rgba(0, 0, 0, 0.5);
   &:last-child {
     margin-bottom: 0;
   }
+
+  // Style spécial pour la section des taux totaux
+  &.total-section {
+    background: #f0f4f8;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border: 1px solid #d0dae5;
+
+    .section-title {
+      color: $itroom-blue;
+      border-color: $itroom-blue;
+      font-size: 1.1rem;
+    }
+
+    .metric-item {
+      background: white;
+      border-width: 2px;
+      font-weight: 600;
+
+      &.total-real {
+        border-color: $itroom-blue;
+      }
+
+      &.total-estimated {
+        border-color: $itroom-blue-light;
+      }
+    }
+
+    .metric-label {
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .metric-value {
+      font-size: 2rem;
+    }
+  }
 }
 
 .section-title {
@@ -224,6 +262,39 @@ $dark-shadow: rgba(0, 0, 0, 0.5);
 
   .metric-value {
     color: white;
+  }
+
+  // Style spécial pour la section des taux totaux en mode sombre
+  .metric-section.total-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+
+    .section-title {
+      color: $itroom-blue-light;
+      border-color: $itroom-blue-light;
+    }
+
+    .metric-item {
+      background: rgba($dark-bg, 0.5);
+
+      &.total-real {
+        border-color: $itroom-blue;
+        background: linear-gradient(135deg, rgba($itroom-blue, 0.2) 0%, rgba($itroom-blue, 0.3) 100%);
+      }
+
+      &.total-estimated {
+        border-color: $itroom-blue-light;
+        background: linear-gradient(135deg, rgba($itroom-blue-light, 0.2) 0%, rgba($itroom-blue-light, 0.3) 100%);
+      }
+    }
+
+    .metric-label {
+      color: white;
+    }
+
+    .metric-value {
+      color: white;
+    }
   }
 }
 

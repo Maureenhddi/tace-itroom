@@ -1,6 +1,8 @@
 // IT-Room colors
 $itroom-blue: #2c5f8d;
 $itroom-blue-hover: #1e4a6f;
+$itroom-blue-dark: #163954;
+$itroom-blue-darker: #0d2438;
 $itroom-text: #4c4c4c;
 $itroom-text-dark: #333;
 $itroom-bg: #fff;
@@ -18,6 +20,14 @@ $status-low: #dc3545;
 $status-low-light: #f8d7da;
 $status-low-border: #f5c6cb;
 
+// Rate row colors (soft style)
+$rate-bg: #f0f4f8;
+$rate-bg-first: #e8eef4;
+$rate-bg-hover: #e3ebf3;
+$rate-bg-hover-first: #dae3ed;
+$rate-border: #d0dae5;
+$rate-border-first: #c5d3e0;
+
 // Dark mode colors
 $dark-bg: #0f1419;
 $dark-card-bg: #1a1f26;
@@ -25,6 +35,35 @@ $dark-cell-bg: #1a1f26;
 $dark-text: #e0e0e0;
 $dark-border: #2d3748;
 $dark-shadow: rgba(0, 0, 0, 0.5);
+
+// Mixins
+@mixin title-row-base {
+  background-color: $itroom-blue-hover !important;
+  color: white !important;
+  font-weight: 800 !important;
+  font-size: 1.2rem !important;
+  text-align: center !important;
+  border: 2px solid $itroom-blue-darker !important;
+  padding: 18px !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+@mixin rate-row-cell {
+  background-color: $rate-bg !important;
+  color: $itroom-text-dark !important;
+  font-weight: 700 !important;
+  font-size: 1.05rem !important;
+  border: 1px solid $rate-border !important;
+  padding: 14px 20px !important;
+}
+
+@mixin rate-row-first-cell {
+  background-color: $rate-bg-first !important;
+  color: $itroom-blue !important;
+  font-weight: 700 !important;
+  border: 1px solid $rate-border-first !important;
+}
 
 // Card container
 .table-card {
@@ -111,31 +150,10 @@ $dark-shadow: rgba(0, 0, 0, 0.5);
         background: white;
       }
 
-      // Status color classes for activity rates
-      &.rate-good {
-        background-color: $status-good-light !important;
-        border-color: $status-good-border !important;
-        color: darken($status-good, 20%) !important;
-        font-weight: 600;
-      }
-
-      &.rate-average {
-        background-color: $status-average-light !important;
-        border-color: $status-average-border !important;
-        color: darken($status-average, 30%) !important;
-        font-weight: 600;
-      }
-
-      &.rate-low {
-        background-color: $status-low-light !important;
-        border-color: $status-low-border !important;
-        color: darken($status-low, 10%) !important;
-        font-weight: 600;
-      }
     }
 
-    // Custom rows (équipes)
-    tr.custom-row {
+    // Custom rows (équipes) - mais pas les title-row
+    tr.custom-row:not(.title-row):not(.rate-row) {
       td {
         background-color: white;
         color: $itroom-text-dark;
@@ -162,21 +180,58 @@ $dark-shadow: rgba(0, 0, 0, 0.5);
       }
     }
 
-    // Title row (TOTAL, EQUIPE FRONT, etc.)
+    // Title row (TOTAL, EQUIPE FRONT, etc.) - Plus spécifique
+    tr.custom-row.title-row,
     tr.title-row {
       td {
-        background-color: $itroom-blue !important;
-        color: white !important;
-        font-weight: 700 !important;
-        font-size: 1.1rem;
-        text-align: center !important;
-        border: 1px solid darken($itroom-blue, 5%) !important;
-        padding: 16px !important;
+        @include title-row-base;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
       }
 
       &:hover td {
-        background-color: $itroom-blue-hover !important;
+        background-color: $itroom-blue-dark !important;
       }
+    }
+
+    // Rate row (lignes de taux d'activité - mise en avant)
+    tr.rate-row {
+      td {
+        @include rate-row-cell;
+
+        &:first-child {
+          @include rate-row-first-cell;
+        }
+      }
+
+      &:hover td {
+        background-color: $rate-bg-hover !important;
+
+        &:first-child {
+          background-color: $rate-bg-hover-first !important;
+        }
+      }
+    }
+
+    // Status color classes for activity rates - Apply ONLY to rate-row cells
+    tr.rate-row td.rate-good {
+      background-color: $status-good-light !important;
+      border-color: $status-good-border !important;
+      color: darken($status-good, 20%) !important;
+      font-weight: 600 !important;
+    }
+
+    tr.rate-row td.rate-average {
+      background-color: $status-average-light !important;
+      border-color: $status-average-border !important;
+      color: darken($status-average, 30%) !important;
+      font-weight: 600 !important;
+    }
+
+    tr.rate-row td.rate-low {
+      background-color: $status-low-light !important;
+      border-color: $status-low-border !important;
+      color: darken($status-low, 10%) !important;
+      font-weight: 600 !important;
     }
   }
 }
@@ -203,7 +258,7 @@ $dark-shadow: rgba(0, 0, 0, 0.5);
         }
       }
 
-      tr.custom-row td {
+      tr.custom-row:not(.title-row):not(.rate-row) td {
         background-color: $dark-cell-bg !important;
         color: white !important;
 
@@ -213,7 +268,7 @@ $dark-shadow: rgba(0, 0, 0, 0.5);
         }
       }
 
-      tr.custom-row:hover td {
+      tr.custom-row:not(.title-row):not(.rate-row):hover td {
         background-color: white !important;
         color: $itroom-text-dark !important;
 
@@ -223,37 +278,68 @@ $dark-shadow: rgba(0, 0, 0, 0.5);
         }
       }
 
+      tr.custom-row.title-row td,
       tr.title-row td {
-        background-color: $itroom-blue !important;
-        color: white !important;
+        @include title-row-base;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      tr.custom-row.title-row:hover td,
+      tr.title-row:hover td {
+        background-color: $itroom-blue-dark !important;
+      }
+
+      // Rate row en mode sombre (lignes de taux d'activité)
+      tr.rate-row {
+        td {
+          background-color: rgba(255, 255, 255, 0.05) !important;
+          color: #b8c5d3 !important;
+          font-weight: 700 !important;
+          font-size: 1.05rem !important;
+          border: 1px solid rgba(255, 255, 255, 0.15) !important;
+
+          &:first-child {
+            background-color: rgba($itroom-blue, 0.4) !important;
+            color: #d4e0ed !important;
+            border: 1px solid rgba($itroom-blue, 0.6) !important;
+          }
+        }
+
+        &:hover td {
+          background-color: rgba(255, 255, 255, 0.08) !important;
+
+          &:first-child {
+            background-color: rgba($itroom-blue, 0.5) !important;
+          }
+        }
       }
 
       // Hover effect pour les lignes normales en dark mode
-      tr:not(.custom-row):not(.title-row):hover td {
+      tr:not(.custom-row):not(.title-row):not(.rate-row):hover td {
         background-color: white !important;
         color: $itroom-text-dark !important;
       }
 
-      // Status color classes in dark mode
-      td.rate-good {
+      // Status color classes in dark mode - Apply ONLY to rate-row cells
+      tr.rate-row td.rate-good {
         background-color: rgba($status-good, 0.25) !important;
         border-color: $status-good !important;
         color: lighten($status-good, 20%) !important;
-        font-weight: 600;
+        font-weight: 600 !important;
       }
 
-      td.rate-average {
+      tr.rate-row td.rate-average {
         background-color: rgba($status-average, 0.25) !important;
         border-color: $status-average !important;
         color: lighten($status-average, 10%) !important;
-        font-weight: 600;
+        font-weight: 600 !important;
       }
 
-      td.rate-low {
+      tr.rate-row td.rate-low {
         background-color: rgba($status-low, 0.25) !important;
         border-color: $status-low !important;
         color: lighten($status-low, 15%) !important;
-        font-weight: 600;
+        font-weight: 600 !important;
       }
     }
   }

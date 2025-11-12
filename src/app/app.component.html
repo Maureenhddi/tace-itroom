@@ -1,113 +1,118 @@
-<div class="container">
-  <mat-card class="header-card">
-    <mat-card-header>
-      <div class="header-content">
-        <div class="logo-section">
-          <img src="/assets/img/logowhite.png" alt="IT-Room Logo" class="logo" />
+@if (isHomeRoute) {
+  <div class="container">
+    <mat-card class="header-card">
+      <mat-card-header>
+        <div class="header-content">
+          <div class="logo-section">
+            <img src="/assets/img/logowhite.png" alt="IT-Room Logo" class="logo" />
+          </div>
+          <div class="title-section">
+            <mat-card-title>Tableau de Bord</mat-card-title>
+            @if (isSignedIn) {
+              <mat-card-subtitle>Données synchronisées automatiquement</mat-card-subtitle>
+            }
+          </div>
+          <div class="header-actions">
+            <button mat-icon-button routerLink="/admin" matTooltip="Administration">
+              <span class="material-icons">settings</span>
+            </button>
+            <button mat-icon-button (click)="toggleTheme()" [attr.aria-label]="(isDarkMode$ | async) ? 'Activer le mode clair' : 'Activer le mode sombre'">
+              <span class="material-icons">{{ (isDarkMode$ | async) ? 'light_mode' : 'dark_mode' }}</span>
+            </button>
+          </div>
         </div>
-        <div class="title-section">
-          <mat-card-title>Tableau de Bord</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- Connexion -->
+        <div class="auth-section">
+          @if (!isSignedIn) {
+            <p>Connectez-vous pour accéder aux données Google Sheets</p>
+
+            <button mat-raised-button color="primary" (click)="signIn()">
+              Se connecter avec Google
+            </button>
+          }
+
           @if (isSignedIn) {
-            <mat-card-subtitle>Données synchronisées automatiquement</mat-card-subtitle>
+            <button mat-raised-button color="accent" (click)="signOut()">
+              Se déconnecter
+            </button>
           }
         </div>
-        <div class="theme-toggle">
-          <button mat-icon-button (click)="toggleTheme()" [attr.aria-label]="(isDarkMode$ | async) ? 'Activer le mode clair' : 'Activer le mode sombre'">
-            <span class="material-icons">{{ (isDarkMode$ | async) ? 'light_mode' : 'dark_mode' }}</span>
-          </button>
-        </div>
-      </div>
-    </mat-card-header>
-    <mat-card-content>
-      <!-- Connexion -->
-      <div class="auth-section">
-        @if (!isSignedIn) {
-          <p>Connectez-vous pour accéder aux données Google Sheets</p>
-
-          <button mat-raised-button color="primary" (click)="signIn()">
-            Se connecter avec Google
-          </button>
-        }
-
-        @if (isSignedIn) {
-          <button mat-raised-button color="accent" (click)="signOut()">
-            Se déconnecter
-          </button>
-        }
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Error -->
-  @if (error) {
-    <mat-card class="error-card">
-      <mat-card-content>
-        <p>{{ error }}</p>
       </mat-card-content>
     </mat-card>
-  }
 
-  <!-- Onglets avec données de chaque sheet -->
-  @if (isSignedIn) {
-    <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="tabs-container">
-      @for (tab of tabs; track tab.name; let i = $index) {
-        <mat-tab [label]="tab.name">
-          @if (tab.loading) {
-            <div style="text-align: center; padding: 2rem;">
-              <mat-spinner></mat-spinner>
-            </div>
-          } @else if (i === 0) {
-            <!-- Onglet Tableau de bord -->
-            <app-dashboard-summary [monthlySummaries]="monthlySummaries"></app-dashboard-summary>
-          } @else if (tab.monthlyData && tab.monthlyData.length > 0) {
-            <!-- Sous-onglets pour chaque mois -->
-            <mat-tab-group class="sub-tabs-container">
-              @for (monthData of tab.monthlyData; track monthData.month) {
-                <mat-tab [label]="monthData.month">
-                  <!-- Afficher les graphiques uniquement pour l'onglet "TAUX D'ACTIVITÉ PAR JOUR" (index 3) -->
-                  @if (i === 3 && monthData.dailyMetrics && monthData.dailyMetrics.length > 0) {
-                    <div class="charts-section">
-                      <app-activity-chart
-                        [dailyMetrics]="monthData.dailyMetrics"
-                        [chartType]="'expertise'"
-                        [title]="'Taux d\'activité réel - E-commerce vs Sur mesure'">
-                      </app-activity-chart>
+    <!-- Error -->
+    @if (error) {
+      <mat-card class="error-card">
+        <mat-card-content>
+          <p>{{ error }}</p>
+        </mat-card-content>
+      </mat-card>
+    }
 
-                      <app-activity-chart
-                        [dailyMetrics]="monthData.dailyMetrics"
-                        [chartType]="'ecommerce-teams'"
-                        [title]="'Taux d\'activité réel E-commerce - Front vs Back'">
-                      </app-activity-chart>
+    <!-- Onglets avec données de chaque sheet -->
+    @if (isSignedIn) {
+      <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="tabs-container">
+        @for (tab of tabs; track tab.name; let i = $index) {
+          <mat-tab [label]="tab.name">
+            @if (tab.loading) {
+              <div style="text-align: center; padding: 2rem;">
+                <mat-spinner></mat-spinner>
+              </div>
+            } @else if (i === 0) {
+              <!-- Onglet Tableau de bord -->
+              <app-dashboard-summary [monthlySummaries]="monthlySummaries"></app-dashboard-summary>
+            } @else if (tab.monthlyData && tab.monthlyData.length > 0) {
+              <!-- Sous-onglets pour chaque mois -->
+              <mat-tab-group class="sub-tabs-container">
+                @for (monthData of tab.monthlyData; track monthData.month) {
+                  <mat-tab [label]="monthData.month">
+                    <!-- Afficher les graphiques uniquement pour l'onglet "TAUX D'ACTIVITÉ PAR JOUR" (index 3) -->
+                    @if (i === 3 && monthData.dailyMetrics && monthData.dailyMetrics.length > 0) {
+                      <div class="charts-section">
+                        <app-activity-chart
+                          [dailyMetrics]="monthData.dailyMetrics"
+                          [chartType]="'expertise'"
+                          [title]="'Taux d\'activité réel - E-commerce vs Sur mesure'">
+                        </app-activity-chart>
 
-                      <app-activity-chart
-                        [dailyMetrics]="monthData.dailyMetrics"
-                        [chartType]="'surmesure-teams'"
-                        [title]="'Taux d\'activité réel Sur mesure - Front vs Back'">
-                      </app-activity-chart>
-                    </div>
-                  }
+                        <app-activity-chart
+                          [dailyMetrics]="monthData.dailyMetrics"
+                          [chartType]="'ecommerce-teams'"
+                          [title]="'Taux d\'activité réel E-commerce - Front vs Back'">
+                        </app-activity-chart>
 
-                  <app-data-table
-                    [data]="monthData.data"
-                    [displayedColumns]="monthData.displayedColumns"
-                    [headers]="monthData.headers"
-                    [loading]="false">
-                  </app-data-table>
-                </mat-tab>
-              }
-            </mat-tab-group>
-          } @else {
-            <app-data-table
-              [data]="tab.data"
-              [displayedColumns]="tab.displayedColumns"
-              [headers]="tab.headers"
-              [loading]="tab.loading">
-            </app-data-table>
-          }
-        </mat-tab>
-      }
-    </mat-tab-group>
-  }
-</div>
+                        <app-activity-chart
+                          [dailyMetrics]="monthData.dailyMetrics"
+                          [chartType]="'surmesure-teams'"
+                          [title]="'Taux d\'activité réel Sur mesure - Front vs Back'">
+                        </app-activity-chart>
+                      </div>
+                    }
+
+                    <app-data-table
+                      [data]="monthData.data"
+                      [displayedColumns]="monthData.displayedColumns"
+                      [headers]="monthData.headers"
+                      [loading]="false">
+                    </app-data-table>
+                  </mat-tab>
+                }
+              </mat-tab-group>
+            } @else {
+              <app-data-table
+                [data]="tab.data"
+                [displayedColumns]="tab.displayedColumns"
+                [headers]="tab.headers"
+                [loading]="tab.loading">
+              </app-data-table>
+            }
+          </mat-tab>
+        }
+      </mat-tab-group>
+    }
+  </div>
+}
 
 <router-outlet />

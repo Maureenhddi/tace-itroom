@@ -1,0 +1,192 @@
+// IT-Room colors
+$itroom-blue: #1e87f0;
+$itroom-text: #4c4c4c;
+$itroom-text-dark: #333;
+
+.admin-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  .back-button {
+    color: $itroom-blue;
+    background: rgba($itroom-blue, 0.1);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba($itroom-blue, 0.2);
+      transform: translateX(-2px);
+    }
+
+    .material-icons {
+      font-size: 24px;
+    }
+  }
+}
+
+.admin-title {
+  font-size: 2rem;
+  color: $itroom-text-dark;
+  margin: 0;
+  font-weight: 600;
+}
+
+.config-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+
+  mat-card-header {
+    padding: 1.5rem 1.5rem 0;
+  }
+
+  mat-card-title {
+    color: $itroom-blue;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  mat-card-content {
+    padding: 1.5rem;
+  }
+}
+
+.description {
+  color: $itroom-text;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.url-field {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+
+  button {
+    padding: 0.5rem 2rem;
+    font-weight: 500;
+  }
+}
+
+.info-section {
+  background: #f0f7ff;
+  padding: 1.5rem;
+  border-radius: 6px;
+  border: 1px solid #c5e0ff;
+
+  h3 {
+    margin: 0 0 1rem 0;
+    color: $itroom-blue;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: $itroom-text;
+
+    li {
+      margin-bottom: 0.5rem;
+      line-height: 1.6;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      strong {
+        color: $itroom-text-dark;
+      }
+    }
+  }
+}
+
+// Dark mode
+::ng-deep body.dark-theme {
+  .admin-title {
+    color: #e0e0e0;
+  }
+
+  .config-card {
+    background: #1a1f26;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+    mat-card-title {
+      color: #64b5f6;
+    }
+  }
+
+  .description {
+    color: #b0b0b0;
+  }
+
+  .info-section {
+    background: rgba(30, 135, 240, 0.1);
+    border-color: rgba(30, 135, 240, 0.3);
+
+    h3 {
+      color: #64b5f6;
+    }
+
+    ul {
+      color: #b0b0b0;
+
+      li strong {
+        color: #e0e0e0;
+      }
+    }
+  }
+}
+
+// Snackbar styles
+::ng-deep .success-snackbar {
+  background-color: #28a745 !important;
+  color: white !important;
+
+  .mat-mdc-snack-bar-label {
+    color: white !important;
+  }
+
+  .mat-mdc-button {
+    color: white !important;
+  }
+}
+
+::ng-deep .error-snackbar {
+  background-color: #dc3545 !important;
+  color: white !important;
+
+  .mat-mdc-snack-bar-label {
+    color: white !important;
+  }
+
+  .mat-mdc-button {
+    color: white !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 1rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}

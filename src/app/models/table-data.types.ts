@@ -7,6 +7,7 @@ export interface TableRow {
   isCustomRow?: boolean;
   isSubRow?: boolean;
   isTitleRow?: boolean;
+  isRateRow?: boolean; // Pour mettre en avant les lignes de taux d'activité
 }
 
 export interface TableHeader {

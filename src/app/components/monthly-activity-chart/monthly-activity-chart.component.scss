@@ -1,0 +1,36 @@
+// IT-Room colors
+$itroom-blue: #1e87f0;
+$itroom-text-dark: #333;
+
+.chart-container {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.chart-title {
+  color: $itroom-text-dark;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 400px;
+  width: 100%;
+}
+
+// Dark mode
+::ng-deep body.dark-theme {
+  .chart-container {
+    background: #2d2d2d;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .chart-title {
+    color: #e0e0e0;
+  }
+}

@@ -1,6 +1,9 @@
 // IT-Room colors
 $itroom-blue: #1e87f0;
 $itroom-text-dark: #333;
+$insight-bg: #f0f7ff;
+$insight-border: #c5e0ff;
+$insight-icon-color: #f59c16;
 
 .chart-container {
   margin: 2rem 0;
@@ -24,6 +27,51 @@ $itroom-text-dark: #333;
   width: 100%;
 }
 
+.insights-container {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: $insight-bg;
+  border: 1px solid $insight-border;
+  border-radius: 6px;
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.insights-icon {
+  flex-shrink: 0;
+
+  .material-icons {
+    font-size: 28px;
+    color: $insight-icon-color;
+  }
+}
+
+.insights-list {
+  flex: 1;
+}
+
+.insight-item {
+  margin: 0;
+  padding: 0.5rem 0;
+  color: $itroom-text-dark;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  font-weight: 500;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid rgba($itroom-blue, 0.1);
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  &:first-child {
+    padding-top: 0;
+  }
+}
+
 // Dark mode
 ::ng-deep body.dark-theme {
   .chart-container {
@@ -33,5 +81,24 @@ $itroom-text-dark: #333;
 
   .chart-title {
     color: #e0e0e0;
+  }
+
+  .insights-container {
+    background: rgba(30, 135, 240, 0.1);
+    border-color: rgba(30, 135, 240, 0.3);
+  }
+
+  .insights-icon {
+    .material-icons {
+      color: #ffa726;
+    }
+  }
+
+  .insight-item {
+    color: #e0e0e0;
+
+    &:not(:last-child) {
+      border-bottom-color: rgba(30, 135, 240, 0.2);
+    }
   }
 }

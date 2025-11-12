@@ -9,6 +9,7 @@ import {
   GoogleSheetsMetadata,
   GoogleSheet
 } from '../models/google-api.types';
+import { ConfigService } from './config.service';
 
 declare const google: Window['google'];
 
@@ -22,7 +23,7 @@ export class GoogleSheetsService {
   private readonly TOKEN_STORAGE_KEY = 'google_access_token';
   private readonly TOKEN_EXPIRY_KEY = 'google_token_expiry';
 
-  constructor() {
+  constructor(private configService: ConfigService) {
     // Restaurer le token depuis le localStorage au démarrage
     this.loadTokenFromStorage();
   }
@@ -293,10 +294,24 @@ export class GoogleSheetsService {
   }
 
   /**
-   * Get the default spreadsheet ID from environment configuration
+   * Extract spreadsheet ID from a Google Sheets URL
+   * @param url - Google Sheets URL (e.g., https://docs.google.com/spreadsheets/d/SPREADSHEET_ID/edit...)
+   * @returns The extracted spreadsheet ID or empty string if not found
+   */
+  private extractSpreadsheetIdFromUrl(url: string): string {
+    const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+    return match ? match[1] : '';
+  }
+
+  /**
+   * Get the default spreadsheet ID from ConfigService (with fallback to environment)
    */
   getDefaultSpreadsheetId(): string {
-    return environment.googleApi.spreadsheetId || '';
+    const configUrl = this.configService.getPlanChargeUrl();
+    const spreadsheetId = this.extractSpreadsheetIdFromUrl(configUrl);
+
+    // Fallback to environment if extraction fails
+    return spreadsheetId || environment.googleApi.spreadsheetId || '';
   }
 
   /**

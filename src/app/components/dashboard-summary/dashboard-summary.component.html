@@ -1,6 +1,5 @@
 <div class="dashboard-container">
-  <h2 class="dashboard-title">Résumé des Taux d'Activité Réel par Mois</h2>
-
+  <h2 class="dashboard-title">Résumé des Taux d'Activité par Mois</h2>
   <div class="summary-grid">
     @for (summary of monthlySummaries; track summary.month) {
       <mat-card class="month-card">
@@ -8,6 +7,21 @@
           <mat-card-title>{{ summary.month }}</mat-card-title>
         </mat-card-header>
         <mat-card-content>
+          <!-- Taux totaux -->
+          <div class="metric-section total-section">
+            <h3 class="section-title">Global</h3>
+            <div class="metrics-row">
+              <div class="metric-item total-real" [ngClass]="getRateClass(summary.totalMetrics.realRate)">
+                <span class="metric-label">Taux réel</span>
+                <span class="metric-value">{{ summary.totalMetrics.realRate }}%</span>
+              </div>
+              <div class="metric-item total-estimated" [ngClass]="getRateClass(summary.totalMetrics.estimatedRate)">
+                <span class="metric-label">Taux estimé</span>
+                <span class="metric-value">{{ summary.totalMetrics.estimatedRate }}%</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Taux par équipe -->
           <div class="metric-section">
             <h3 class="section-title">Par Équipe</h3>
@@ -41,4 +55,13 @@
       </mat-card>
     }
   </div>
+
+    <!-- Graphique d'évolution mensuelle -->
+  @if (monthlyChartData.length > 0) {
+    <app-monthly-activity-chart
+      [monthlyData]="monthlyChartData"
+      [title]="'Évolution du Taux d\'Activité Total'">
+    </app-monthly-activity-chart>
+  }
+
 </div>

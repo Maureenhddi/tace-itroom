@@ -139,9 +139,10 @@ $dark-shadow: rgba(0, 0, 0, 0.5);
   flex: 1;
 }
 
-.theme-toggle {
+.header-actions {
   display: flex;
   align-items: center;
+  gap: 0.5rem;
 
   button {
     color: white;

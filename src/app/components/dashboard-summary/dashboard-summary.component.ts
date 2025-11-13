@@ -1,7 +1,9 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MonthlyActivityChartComponent } from '../monthly-activity-chart/monthly-activity-chart.component';
+import { ProjectStatistics } from '../../services/activity-rate.service';
 
 export interface MonthlySummary {
   month: string;
@@ -17,12 +19,14 @@ export interface MonthlySummary {
     ecommerceRate: number;
     surMesureRate: number;
   };
+  projects: string[]; // Liste des projets du mois
+  projectStats: ProjectStatistics[]; // Statistiques détaillées par projet
 }
 
 @Component({
   selector: 'app-dashboard-summary',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MonthlyActivityChartComponent],
+  imports: [CommonModule, MatCardModule, MatTooltipModule, MonthlyActivityChartComponent],
   templateUrl: './dashboard-summary.component.html',
   styleUrl: './dashboard-summary.component.scss'
 })

@@ -1,0 +1,471 @@
+// IT-Room colors
+$itroom-blue: #2c5f8d;
+$itroom-blue-light: #4a8ec4;
+$itroom-orange: #f59c16;
+$itroom-green: #28a745;
+$itroom-text: #4c4c4c;
+$itroom-text-dark: #333;
+$itroom-text-light: #666;
+$itroom-bg: #fff;
+$itroom-bg-muted: #f8f9fa;
+$itroom-border: #e5e5e5;
+
+// Dark mode colors
+$dark-bg: #0f1419;
+$dark-card-bg: #1a1f26;
+$dark-text: #e0e0e0;
+$dark-text-secondary: #b0b0b0;
+$dark-border: #2d3748;
+$dark-shadow: rgba(0, 0, 0, 0.5);
+
+.projects-container {
+  padding: 1rem;
+
+  @media (min-width: 768px) {
+    padding: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 2rem;
+  }
+}
+
+.projects-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: $itroom-text-dark;
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+
+  @media (min-width: 768px) {
+    font-size: 1.75rem;
+    margin-bottom: 2rem;
+  }
+}
+
+// Carte des filtres et statistiques
+.filters-card {
+  background: $itroom-bg;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  ::ng-deep .mat-mdc-card-content {
+    padding: 1.5rem !important;
+  }
+}
+
+.filters-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  @media (min-width: 768px) {
+    gap: 2rem;
+  }
+}
+
+.month-filter {
+  width: 100%;
+  max-width: 300px;
+
+  ::ng-deep {
+    .mat-mdc-text-field-wrapper {
+      background-color: $itroom-bg-muted;
+    }
+
+    .mat-mdc-form-field-focus-overlay {
+      background-color: transparent;
+    }
+  }
+}
+
+// Statistiques globales
+.global-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+
+  @media (min-width: 480px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  border-radius: 8px;
+  background: $itroom-bg-muted;
+  border: 2px solid $itroom-border;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-value {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #ffffff;
+  }
+
+  &.total {
+    border-color: $itroom-blue;
+    background: linear-gradient(135deg, rgba($itroom-blue, 0.1) 0%, rgba($itroom-blue, 0.15) 100%);
+  }
+
+  &.front {
+    border-color: $itroom-blue;
+    background: linear-gradient(135deg, rgba($itroom-blue, 0.05) 0%, rgba($itroom-blue, 0.1) 100%);
+  }
+
+  &.back {
+    border-color: $itroom-orange;
+    background: linear-gradient(135deg, rgba($itroom-orange, 0.05) 0%, rgba($itroom-orange, 0.1) 100%);
+  }
+
+  &.cdp {
+    border-color: #6c757d;
+    background: linear-gradient(135deg, rgba(#6c757d, 0.05) 0%, rgba(#6c757d, 0.1) 100%);
+  }
+
+  &.design {
+    border-color: #e83e8c;
+    background: linear-gradient(135deg, rgba(#e83e8c, 0.05) 0%, rgba(#e83e8c, 0.1) 100%);
+  }
+}
+
+// Carte du tableau
+.table-card {
+  background: $itroom-bg;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  ::ng-deep .mat-mdc-card-content {
+    padding: 0 !important;
+  }
+}
+
+.table-container {
+  overflow-x: auto;
+  border-radius: 12px;
+}
+
+.projects-table {
+  width: 100%;
+  background: $itroom-bg;
+
+  th {
+    background: linear-gradient(135deg, $itroom-blue 0%, $itroom-blue-light 100%);
+    color: white !important;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1rem 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  td {
+    padding: 0.875rem 0.75rem;
+    font-size: 0.875rem;
+    border-bottom: 1px solid $itroom-border;
+  }
+
+  tr:hover {
+    background: $itroom-bg-muted;
+  }
+
+  .month-cell {
+    font-weight: 600;
+    color: $itroom-blue;
+    min-width: 120px;
+  }
+
+  .project-name-cell {
+    font-weight: 600;
+    color: $itroom-text-dark;
+    min-width: 200px;
+  }
+
+  .total-cell {
+    font-weight: 700;
+
+    .total-badge {
+      display: inline-block;
+      padding: 0.375rem 0.75rem;
+      background: linear-gradient(135deg, $itroom-blue 0%, $itroom-blue-light 100%);
+      color: white;
+      border-radius: 16px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .team-cell {
+    .team-stat {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-percentage {
+      font-size: 0.75rem;
+      color: $itroom-text-light;
+      font-weight: 500;
+    }
+  }
+
+  .stat-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+
+    &.front {
+      background: $itroom-blue;
+    }
+
+    &.back {
+      background: $itroom-orange;
+    }
+
+    &.cdp {
+      background: #6c757d;
+    }
+
+    &.design {
+      background: #e83e8c;
+    }
+  }
+
+  .empty-value {
+    color: $itroom-text;
+    opacity: 0.4;
+    font-style: italic;
+  }
+}
+
+.no-data {
+  padding: 3rem 2rem;
+  text-align: center;
+
+  p {
+    margin: 0;
+    color: $itroom-text;
+    font-size: 1rem;
+    font-style: italic;
+  }
+}
+
+// Dark theme
+::ng-deep body.dark-theme {
+  .projects-title {
+    color: $dark-text;
+  }
+
+  .filters-card,
+  .table-card {
+    background: $dark-card-bg !important;
+    box-shadow: 0 4px 16px $dark-shadow !important;
+
+    &:hover {
+      box-shadow: 0 6px 20px $dark-shadow !important;
+    }
+  }
+
+  .month-filter {
+    ::ng-deep {
+      .mat-mdc-text-field-wrapper {
+        background-color: rgba($dark-bg, 0.5);
+      }
+
+      .mat-mdc-form-field-label,
+      .mat-mdc-select-value {
+        color: $dark-text;
+      }
+
+      .mat-mdc-select-arrow {
+        color: $dark-text;
+      }
+    }
+  }
+
+  .stat-card {
+    background: rgba($dark-bg, 0.5);
+    border-color: $dark-border;
+
+    .stat-label {
+      color: $dark-text-secondary;
+    }
+
+    .stat-value {
+      color: $dark-text;
+    }
+
+    &.total {
+      border-color: $itroom-blue;
+      background: linear-gradient(135deg, rgba($itroom-blue, 0.2) 0%, rgba($itroom-blue, 0.3) 100%);
+    }
+
+    &.front {
+      background: linear-gradient(135deg, rgba($itroom-blue, 0.15) 0%, rgba($itroom-blue, 0.25) 100%);
+    }
+
+    &.back {
+      background: linear-gradient(135deg, rgba($itroom-orange, 0.15) 0%, rgba($itroom-orange, 0.25) 100%);
+    }
+
+    &.cdp {
+      background: linear-gradient(135deg, rgba(#6c757d, 0.15) 0%, rgba(#6c757d, 0.25) 100%);
+    }
+
+    &.design {
+      background: linear-gradient(135deg, rgba(#e83e8c, 0.15) 0%, rgba(#e83e8c, 0.25) 100%);
+    }
+  }
+
+  .projects-table {
+    background: $dark-card-bg;
+
+    th {
+      background: linear-gradient(135deg, rgba($itroom-blue, 0.8) 0%, rgba($itroom-blue-light, 0.8) 100%);
+    }
+
+    td {
+      border-bottom-color: $dark-border;
+    }
+
+    tr:hover {
+      background: rgba($dark-bg, 0.5);
+    }
+
+    .month-cell {
+      color: $itroom-blue-light;
+    }
+
+    .project-name-cell {
+      color: $dark-text;
+    }
+
+    .total-badge {
+      background: linear-gradient(135deg, rgba($itroom-blue, 0.8) 0%, rgba($itroom-blue-light, 0.8) 100%);
+    }
+
+    .stat-percentage {
+      color: $dark-text-secondary;
+    }
+
+    .stat-badge {
+      &.front {
+        background: rgba($itroom-blue, 0.8);
+      }
+
+      &.back {
+        background: rgba($itroom-orange, 0.8);
+      }
+
+      &.cdp {
+        background: rgba(#6c757d, 0.8);
+      }
+
+      &.design {
+        background: rgba(#e83e8c, 0.8);
+      }
+    }
+
+    .empty-value {
+      color: $dark-text;
+    }
+  }
+
+  .no-data p {
+    color: $dark-text-secondary;
+  }
+}
+
+// Responsive
+@media (max-width: 480px) {
+  .stat-card {
+    padding: 0.75rem;
+
+    .stat-label {
+      font-size: 0.7rem;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .projects-table {
+    th {
+      font-size: 0.75rem;
+      padding: 0.75rem 0.5rem;
+    }
+
+    td {
+      font-size: 0.75rem;
+      padding: 0.75rem 0.5rem;
+    }
+
+    .month-cell {
+      min-width: 100px;
+      font-size: 0.8rem;
+    }
+
+    .project-name-cell {
+      min-width: 150px;
+      font-size: 0.8rem;
+    }
+
+    .stat-badge,
+    .total-badge {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.4rem;
+    }
+
+    .stat-percentage {
+      font-size: 0.65rem;
+    }
+
+    .team-stat {
+      gap: 0.25rem;
+    }
+  }
+}

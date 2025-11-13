@@ -34,6 +34,15 @@ export interface ExpertiseMetrics {
   previsionDays: number;
 }
 
+export interface ProjectStatistics {
+  projectName: string;
+  totalDays: number; // Total de demi-journées
+  frontDays: number;
+  backDays: number;
+  cdpDays: number;
+  designDays: number;
+}
+
 export interface DailyMetrics {
   date: string; // "01/10/2025"
   dayIndex: number; // Index de la colonne dans le sheet (5+ pour les jours)
@@ -144,7 +153,6 @@ export class ActivityRateService {
       }
     }
 
-    console.log(`[${monthName}] Jours ouvrés calculés automatiquement: ${workingDays}`);
     return workingDays;
   }
 
@@ -336,7 +344,6 @@ export class ActivityRateService {
     }
 
     const workingDays = uniqueDates.size;
-    console.log(`Calcul jours ouvrés: ${workingDays} dates uniques détectées sur ${dateRow.length - 5} colonnes`);
     return workingDays;
   }
 
@@ -447,8 +454,6 @@ export class ActivityRateService {
     };
     const monthNumber = monthMap[monthName] || '01';
 
-    console.log(`[${monthName}] Début traitement - monthNumber=${monthNumber}, headerRow.length=${headerRow.length}`);
-
     // Parcourir les colonnes du sheet pour trouver les dates
     // Dans le sheet, chaque jour a 2 colonnes consécutives avec la même date (matin puis après-midi)
     // Les dates sont en format numérique Excel (ex: 45931 = 01/10/2025)
@@ -476,10 +481,6 @@ export class ActivityRateService {
       const dayOfMonth = convertedDate.getDate();
       const month = convertedDate.getMonth() + 1;
 
-      if (monthName === 'Novembre') {
-        console.log(`[${monthName}] colIndex=${colIndex}, dateValue=${dateValue}, convertedMonth=${String(month).padStart(2, '0')}, monthNumber=${monthNumber}, day=${dayOfMonth}`);
-      }
-
       // Vérifier que c'est bien le bon mois
       if (String(month).padStart(2, '0') !== monthNumber) {
         colIndex++;
@@ -490,9 +491,6 @@ export class ActivityRateService {
       const nextDateValue = headerRow[colIndex + 1];
       if (nextDateValue !== dateValue) {
         // Pas de colonne après-midi correspondante, skip
-        if (monthName === 'Novembre') {
-          console.log(`[${monthName}] SKIP: colonne suivante différente - nextDateValue=${nextDateValue}, dateValue=${dateValue}`);
-        }
         colIndex++;
         continue;
       }
@@ -768,8 +766,6 @@ export class ActivityRateService {
       processedDays++;
     }
 
-    console.log(`[${monthName}] Fin traitement - processedDays=${processedDays}, iterations=${iterations}, results.length=${results.length}`);
-
     return results;
   }
 
@@ -1038,5 +1034,138 @@ export class ActivityRateService {
       ecommerceRate: Math.round((ecommerceRates.reduce((a, b) => a + b, 0) / ecommerceRates.length) * 100) / 100,
       surMesureRate: Math.round((surMesureRates.reduce((a, b) => a + b, 0) / surMesureRates.length) * 100) / 100
     };
+  }
+
+  /**
+   * Extrait la liste des projets uniques pour un mois donné
+   * Les projets sont dans les cellules à partir de la colonne 5 (index 5)
+   * Ignore les valeurs spéciales comme "Absence", "Interne", "Non-Aff", "Prévision", etc.
+   */
+  extractProjectsFromMonth(monthData: MonthData): string[] {
+    const projects = new Set<string>();
+
+    // Les 3 premières lignes sont des headers, les vraies données commencent à la ligne 3
+    const dataRows = monthData.sheetData.slice(3);
+
+    // Parcourir toutes les lignes de données
+    dataRows.forEach((row) => {
+      // Parcourir les colonnes à partir de la colonne 5 (les jours/projets)
+      for (let i = 5; i < row.length; i++) {
+        const cellValue = String(row[i] || '').trim();
+
+        // Ignorer les cellules vides
+        if (cellValue === '') continue;
+
+        // Nettoyer le nom du projet (tout le contenu de la cellule)
+        const projectName = cellValue.trim();
+
+        // Vérifier si c'est un mot à ignorer (pas un projet)
+        const ignoredValues = [
+          'Absence',
+          'Interne',
+          'Non-Aff',
+          'Prévision',
+          'OUT',
+          'congé',
+          'conge'
+        ];
+
+        const isIgnored = ignoredValues.some(ignored =>
+          projectName.toLowerCase().includes(ignored.toLowerCase())
+        );
+
+        if (!isIgnored && projectName) {
+          projects.add(projectName);
+        }
+      }
+    });
+
+    const projectsList = Array.from(projects).sort();
+
+    // Retourner la liste triée alphabétiquement
+    return projectsList;
+  }
+
+  /**
+   * Calcule les statistiques de jours planifiés par projet et par équipe
+   * Compte le nombre de demi-journées pour chaque projet, ventilées par équipe
+   */
+  calculateProjectStatistics(monthData: MonthData): ProjectStatistics[] {
+    const projectStats = new Map<string, ProjectStatistics>();
+
+    // Les 3 premières lignes sont des headers, les vraies données commencent à la ligne 3
+    const dataRows = monthData.sheetData.slice(3);
+
+    // Parcourir toutes les lignes de données
+    dataRows.forEach((row) => {
+      const isCDS = row[4] === 'CDS';
+      if (!isCDS) return;
+
+      // Déterminer l'équipe du collaborateur (colonne 3 = PROFIL)
+      const profile = String(row[3] || '');
+      let teamCategory: 'frontDays' | 'backDays' | 'cdpDays' | 'designDays';
+
+      if (profile === 'DEV FRONT') {
+        teamCategory = 'frontDays';
+      } else if (profile === 'DEV BACK') {
+        teamCategory = 'backDays';
+      } else if (profile === 'CdP') {
+        teamCategory = 'cdpDays';
+      } else if (profile === 'GRAPHISTE') {
+        teamCategory = 'designDays';
+      } else {
+        return; // Profil non reconnu, skip
+      }
+
+      // Parcourir les colonnes à partir de la colonne 5 (les jours/projets)
+      for (let i = 5; i < row.length; i++) {
+        const cellValue = String(row[i] || '').trim();
+
+        // Ignorer les cellules vides
+        if (cellValue === '') continue;
+
+        // Nettoyer le nom du projet
+        const projectName = cellValue.trim();
+
+        // Vérifier si c'est un mot à ignorer (pas un projet)
+        const ignoredValues = [
+          'Absence',
+          'Interne',
+          'Non-Aff',
+          'Prévision',
+          'OUT',
+          'congé',
+          'conge'
+        ];
+
+        const isIgnored = ignoredValues.some(ignored =>
+          projectName.toLowerCase().includes(ignored.toLowerCase())
+        );
+
+        if (isIgnored || !projectName) continue;
+
+        // Créer ou mettre à jour les statistiques du projet
+        if (!projectStats.has(projectName)) {
+          projectStats.set(projectName, {
+            projectName,
+            totalDays: 0,
+            frontDays: 0,
+            backDays: 0,
+            cdpDays: 0,
+            designDays: 0
+          });
+        }
+
+        const stats = projectStats.get(projectName)!;
+        stats.totalDays += 0.5; // Chaque cellule = 1 demi-journée
+        stats[teamCategory] += 0.5;
+      }
+    });
+
+    const statsList = Array.from(projectStats.values()).sort((a, b) =>
+      a.projectName.localeCompare(b.projectName)
+    );
+
+    return statsList;
   }
 }

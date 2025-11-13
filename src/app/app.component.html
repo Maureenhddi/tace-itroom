@@ -63,13 +63,25 @@
             } @else if (i === 0) {
               <!-- Onglet Tableau de bord -->
               <app-dashboard-summary [monthlySummaries]="monthlySummaries"></app-dashboard-summary>
+            } @else if (i === 1 && monthlySummaries.length > 0) {
+              <!-- Onglet Projets avec sous-onglets par mois -->
+              <mat-tab-group class="sub-tabs-container">
+                @for (summary of monthlySummaries; track summary.month) {
+                  <mat-tab [label]="summary.month">
+                    <app-projects-overview
+                      [projectStats]="summary.projectStats"
+                      [month]="summary.month">
+                    </app-projects-overview>
+                  </mat-tab>
+                }
+              </mat-tab-group>
             } @else if (tab.monthlyData && tab.monthlyData.length > 0) {
               <!-- Sous-onglets pour chaque mois -->
               <mat-tab-group class="sub-tabs-container">
                 @for (monthData of tab.monthlyData; track monthData.month) {
                   <mat-tab [label]="monthData.month">
-                    <!-- Afficher les graphiques uniquement pour l'onglet "TAUX D'ACTIVITÉ PAR JOUR" (index 3) -->
-                    @if (i === 3 && monthData.dailyMetrics && monthData.dailyMetrics.length > 0) {
+                    <!-- Afficher les graphiques uniquement pour l'onglet "Visualisation TACE" (index 4) -->
+                    @if (i === 4 && monthData.dailyMetrics && monthData.dailyMetrics.length > 0) {
                       <div class="charts-section">
                         <app-activity-chart
                           [dailyMetrics]="monthData.dailyMetrics"

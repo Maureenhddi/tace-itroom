@@ -13,6 +13,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { DataTableComponent } from './components/data-table/data-table.component';
 import { ActivityChartComponent } from './components/activity-chart/activity-chart.component';
 import { DashboardSummaryComponent, MonthlySummary } from './components/dashboard-summary/dashboard-summary.component';
+import { ProjectsOverviewComponent } from './components/projects-overview/projects-overview.component';
 import { Observable, forkJoin } from 'rxjs';
 import { map, filter } from 'rxjs/operators';
 import { TableRow } from './models/table-data.types';
@@ -49,7 +50,8 @@ interface MonthTab {
     MatTooltipModule,
     DataTableComponent,
     ActivityChartComponent,
-    DashboardSummaryComponent
+    DashboardSummaryComponent,
+    ProjectsOverviewComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
@@ -118,10 +120,18 @@ export class AppComponent implements OnInit {
   }
 
   loadAllMonths() {
-    // Créer quatre onglets (+ Tableau de bord)
+    // Créer cinq onglets (+ Tableau de bord + Projets)
     this.tabs = [
       {
         name: 'TABLEAU DE BORD',
+        data: [],
+        displayedColumns: [],
+        headers: [],
+        loading: true,
+        monthlyData: []
+      },
+      {
+        name: 'PROJETS',
         data: [],
         displayedColumns: [],
         headers: [],
@@ -178,8 +188,6 @@ export class AppComponent implements OnInit {
           return monthOrder[monthA] - monthOrder[monthB];
         });
 
-        console.log('Mois valides détectés (triés):', months);
-
         if (months.length === 0) {
           this.error = 'Aucun onglet de mois trouvé dans le Google Sheet';
           this.tabs.forEach(tab => tab.loading = false);
@@ -197,9 +205,10 @@ export class AppComponent implements OnInit {
         forkJoin(monthRequests).subscribe({
           next: (results) => {
             const tabDashboard = this.tabs[0];
-            const tabEquipe = this.tabs[1];
-            const tabExpertise = this.tabs[2];
-            const tabDaily = this.tabs[3];
+            const tabProjets = this.tabs[1];
+            const tabEquipe = this.tabs[2];
+            const tabExpertise = this.tabs[3];
+            const tabDaily = this.tabs[4];
             tabEquipe.monthlyData = [];
             tabExpertise.monthlyData = [];
             tabDaily.monthlyData = [];
@@ -210,7 +219,6 @@ export class AppComponent implements OnInit {
             const validResults = results.filter(({ month, data }) => {
               // Vérifier que l'onglet a des données (au moins 4 lignes : headers + au moins 1 ligne de données)
               if (!data || data.length < 4) {
-                console.log(`${month}: IGNORÉ - Pas assez de données (${data?.length || 0} lignes)`);
                 return false;
               }
 
@@ -219,15 +227,11 @@ export class AppComponent implements OnInit {
 
               // Vérifier qu'il y a au moins 1 jour ouvré
               if (workingDays === 0) {
-                console.log(`${month}: IGNORÉ - Aucun jour ouvré détecté`);
                 return false;
               }
 
-              console.log(`${month}: VALIDE - ${workingDays} jours ouvrés détectés`);
               return true;
             });
-
-            console.log(`Mois valides avec données: ${validResults.length}/${results.length}`);
 
             validResults.forEach(({ month, data }) => {
               // Utiliser les jours ouvrés configurés dans le service
@@ -244,6 +248,7 @@ export class AppComponent implements OnInit {
             }
 
             tabDashboard.loading = false;
+            tabProjets.loading = false;
             tabEquipe.loading = false;
             tabExpertise.loading = false;
             tabDaily.loading = false;
@@ -285,7 +290,7 @@ export class AppComponent implements OnInit {
     const totalRates = this.transformMetricsToMonthlyData(monthlyMetrics, metrics, monthName);
 
     // Ajouter à l'onglet équipe
-    this.tabs[1].monthlyData!.push(monthlyMetrics);
+    this.tabs[2].monthlyData!.push(monthlyMetrics);
 
     // Retourner les taux totaux pour le dashboard
     return totalRates;
@@ -691,7 +696,7 @@ export class AppComponent implements OnInit {
     this.transformExpertiseMetricsToMonthlyData(monthlyMetrics, expertiseMetrics, teamMetrics, monthName);
 
     // Ajouter à l'onglet expertise
-    this.tabs[2].monthlyData!.push(monthlyMetrics);
+    this.tabs[3].monthlyData!.push(monthlyMetrics);
   }
 
   transformExpertiseMetricsToMonthlyData(
@@ -1109,12 +1114,6 @@ export class AppComponent implements OnInit {
 
     const dailyMetrics = this.activityRateService.calculateDailyMetrics(monthData);
 
-    console.log(`[${monthName}] Daily metrics count:`, dailyMetrics.length);
-    if (dailyMetrics.length > 0) {
-      console.log(`[${monthName}] First day:`, dailyMetrics[0]);
-      console.log(`[${monthName}] Last day:`, dailyMetrics[dailyMetrics.length - 1]);
-    }
-
     // Créer les données du tableau pour ce mois
     const monthlyMetrics: MonthlyMetrics = {
       month: monthName,
@@ -1128,11 +1127,17 @@ export class AppComponent implements OnInit {
     this.transformDailyMetricsToMonthlyData(monthlyMetrics, dailyMetrics);
 
     // Ajouter à l'onglet daily
-    this.tabs[3].monthlyData!.push(monthlyMetrics);
+    this.tabs[4].monthlyData!.push(monthlyMetrics);
 
     // Calculer le résumé mensuel pour le tableau de bord
     const summary = this.activityRateService.calculateMonthlySummary(dailyMetrics);
     const totalRates = this.totalRatesByMonth.get(monthName);
+
+    // Extraire les projets uniques pour ce mois
+    const projects = this.activityRateService.extractProjectsFromMonth(monthData);
+
+    // Calculer les statistiques détaillées par projet
+    const projectStats = this.activityRateService.calculateProjectStatistics(monthData);
 
     this.monthlySummaries.push({
       month: monthName,
@@ -1147,7 +1152,9 @@ export class AppComponent implements OnInit {
       expertiseMetrics: {
         ecommerceRate: summary.ecommerceRate,
         surMesureRate: summary.surMesureRate
-      }
+      },
+      projects: projects,
+      projectStats: projectStats
     });
   }
 

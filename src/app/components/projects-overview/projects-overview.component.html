@@ -1,0 +1,130 @@
+<div class="projects-container">
+  <h2 class="projects-title">Projets - {{ month }}</h2>
+
+  <!-- Statistiques globales -->
+  <mat-card class="stats-card">
+    <mat-card-content>
+      <div class="global-stats">
+        <div class="stat-card">
+          <span class="stat-label">Projets</span>
+          <span class="stat-value">{{ globalStats.totalProjects }}</span>
+        </div>
+        <div class="stat-card total">
+          <span class="stat-label">Total</span>
+          <span class="stat-value">{{ globalStats.totalDays }} demi-j</span>
+        </div>
+        <div class="stat-card front">
+          <span class="stat-label">Front</span>
+          <span class="stat-value">{{ globalStats.totalFront }} demi-j</span>
+        </div>
+        <div class="stat-card back">
+          <span class="stat-label">Back</span>
+          <span class="stat-value">{{ globalStats.totalBack }} demi-j</span>
+        </div>
+        <div class="stat-card cdp">
+          <span class="stat-label">CdP</span>
+          <span class="stat-value">{{ globalStats.totalCdp }} demi-j</span>
+        </div>
+        <div class="stat-card design">
+          <span class="stat-label">Design</span>
+          <span class="stat-value">{{ globalStats.totalDesign }} demi-j</span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Tableau des projets -->
+  <mat-card class="table-card">
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="dataSource" matSort class="projects-table">
+
+          <!-- Colonne Projet -->
+          <ng-container matColumnDef="projectName">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Projet</th>
+            <td mat-cell *matCellDef="let project" class="project-name-cell">
+              {{ project.projectName }}
+            </td>
+          </ng-container>
+
+          <!-- Colonne Total -->
+          <ng-container matColumnDef="totalDays">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Total</th>
+            <td mat-cell *matCellDef="let project" class="total-cell">
+              <span class="total-badge">{{ project.totalDays }} demi-j</span>
+            </td>
+          </ng-container>
+
+          <!-- Colonne Front -->
+          <ng-container matColumnDef="frontDays">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Front</th>
+            <td mat-cell *matCellDef="let project" class="team-cell">
+              @if (project.frontDays > 0) {
+                <div class="team-stat">
+                  <span class="stat-badge front">{{ project.frontDays }} demi-j</span>
+                  <span class="stat-percentage">({{ getPercentage(project.frontDays, project.totalDays) }}%)</span>
+                </div>
+              } @else {
+                <span class="empty-value">-</span>
+              }
+            </td>
+          </ng-container>
+
+          <!-- Colonne Back -->
+          <ng-container matColumnDef="backDays">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Back</th>
+            <td mat-cell *matCellDef="let project" class="team-cell">
+              @if (project.backDays > 0) {
+                <div class="team-stat">
+                  <span class="stat-badge back">{{ project.backDays }} demi-j</span>
+                  <span class="stat-percentage">({{ getPercentage(project.backDays, project.totalDays) }}%)</span>
+                </div>
+              } @else {
+                <span class="empty-value">-</span>
+              }
+            </td>
+          </ng-container>
+
+          <!-- Colonne CdP -->
+          <ng-container matColumnDef="cdpDays">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>CdP</th>
+            <td mat-cell *matCellDef="let project" class="team-cell">
+              @if (project.cdpDays > 0) {
+                <div class="team-stat">
+                  <span class="stat-badge cdp">{{ project.cdpDays }} demi-j</span>
+                  <span class="stat-percentage">({{ getPercentage(project.cdpDays, project.totalDays) }}%)</span>
+                </div>
+              } @else {
+                <span class="empty-value">-</span>
+              }
+            </td>
+          </ng-container>
+
+          <!-- Colonne Design -->
+          <ng-container matColumnDef="designDays">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Design</th>
+            <td mat-cell *matCellDef="let project" class="team-cell">
+              @if (project.designDays > 0) {
+                <div class="team-stat">
+                  <span class="stat-badge design">{{ project.designDays }} demi-j</span>
+                  <span class="stat-percentage">({{ getPercentage(project.designDays, project.totalDays) }}%)</span>
+                </div>
+              } @else {
+                <span class="empty-value">-</span>
+              }
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        @if (dataSource.data.length === 0) {
+          <div class="no-data">
+            <p>Aucun projet pour ce mois.</p>
+          </div>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

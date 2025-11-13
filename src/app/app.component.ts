@@ -11,7 +11,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DataTableComponent } from './components/data-table/data-table.component';
-import { ActivityChartComponent } from './components/activity-chart/activity-chart.component';
 import { DashboardSummaryComponent, MonthlySummary } from './components/dashboard-summary/dashboard-summary.component';
 import { ProjectsOverviewComponent } from './components/projects-overview/projects-overview.component';
 import { Observable, forkJoin } from 'rxjs';
@@ -49,7 +48,6 @@ interface MonthTab {
     MatTabsModule,
     MatTooltipModule,
     DataTableComponent,
-    ActivityChartComponent,
     DashboardSummaryComponent,
     ProjectsOverviewComponent
   ],
@@ -66,6 +64,7 @@ export class AppComponent implements OnInit {
   tabs: MonthTab[] = [];
   selectedTabIndex = 0;
   monthlySummaries: MonthlySummary[] = [];
+  consolidatedDailyMetrics: DailyMetrics[] = [];
   private totalRatesByMonth: Map<string, { realRate: number; estimatedRate: number }> = new Map();
 
   constructor(
@@ -245,6 +244,18 @@ export class AppComponent implements OnInit {
 
             if (validResults.length === 0) {
               this.error = 'Aucun mois avec des données valides trouvé';
+            }
+
+            // Consolider toutes les métriques quotidiennes de tous les mois
+            const allMonthlyMetrics = tabDaily.monthlyData
+              ?.filter(monthData => monthData.dailyMetrics && monthData.dailyMetrics.length > 0)
+              .map(monthData => ({
+                month: monthData.month,
+                dailyMetrics: monthData.dailyMetrics!
+              })) || [];
+
+            if (allMonthlyMetrics.length > 0) {
+              this.consolidatedDailyMetrics = this.activityRateService.consolidateAllDailyMetrics(allMonthlyMetrics);
             }
 
             tabDashboard.loading = false;

@@ -1087,6 +1087,124 @@ export class ActivityRateService {
   }
 
   /**
+   * Consolide toutes les métriques quotidiennes de plusieurs mois en une seule liste
+   * Regroupe les demi-journées (Matin + Après-midi) en une seule journée complète
+   * Moyenne les valeurs pour obtenir un taux d'activité par jour
+   */
+  consolidateAllDailyMetrics(monthlyMetrics: { month: string; dailyMetrics: DailyMetrics[] }[]): DailyMetrics[] {
+    // Structure temporaire pour regrouper et trier
+    interface DayData {
+      date: string;
+      metrics: DailyMetrics[];
+      sortKey: string;
+    }
+
+    const dayMap = new Map<string, DayData>();
+
+    monthlyMetrics.forEach(({ month, dailyMetrics }) => {
+      // Extraire le mois et l'année (ex: "Octobre 2025" -> "Oct", "2025")
+      const monthParts = month.split(' ');
+      const monthName = monthParts[0];
+      const year = monthParts[1] || '2025';
+      const monthShort = monthName.substring(0, 3);
+
+      // Mapper les mois français vers leur numéro
+      const monthMap: { [key: string]: string } = {
+        'Jan': '01', 'Fév': '02', 'Mar': '03', 'Avr': '04',
+        'Mai': '05', 'Jui': '06', 'Jul': '07', 'Aoû': '08',
+        'Sep': '09', 'Oct': '10', 'Nov': '11', 'Déc': '12'
+      };
+      const monthNumber = monthMap[monthShort] || '01';
+
+      dailyMetrics.forEach(metric => {
+        // Modifier la date pour inclure le mois (ex: "01/10/2025 Matin" -> "01 Oct")
+        const dateParts = metric.date.split('/');
+        const day = dateParts[0];
+        const fullDate = `${day} ${monthShort}`;
+
+        // Créer une clé de tri au format YYYY-MM-DD pour trier correctement
+        const sortKey = `${year}-${monthNumber}-${day.padStart(2, '0')}`;
+
+        // Regrouper les demi-journées par date complète
+        if (!dayMap.has(fullDate)) {
+          dayMap.set(fullDate, { date: fullDate, metrics: [], sortKey });
+        }
+        dayMap.get(fullDate)!.metrics.push(metric);
+      });
+    });
+
+    // Agréger les métriques pour chaque jour complet
+    const consolidated: Array<DailyMetrics & { sortKey: string }> = [];
+    dayMap.forEach(({ metrics, sortKey }, date) => {
+      // Calculer les moyennes pour chaque champ numérique
+      const avgMetric: DailyMetrics & { sortKey: string } = {
+        date: date,
+        dayIndex: metrics[0].dayIndex,
+        isWorkingDay: metrics[0].isWorkingDay,
+        cumulativeWorkingDays: metrics[0].cumulativeWorkingDays,
+        totalCDS: this.avgField(metrics, 'totalCDS'),
+        equipeFront: this.avgField(metrics, 'equipeFront'),
+        frontEcommerce: this.avgField(metrics, 'frontEcommerce'),
+        frontSurMesure: this.avgField(metrics, 'frontSurMesure'),
+        equipeBack: this.avgField(metrics, 'equipeBack'),
+        backEcommerce: this.avgField(metrics, 'backEcommerce'),
+        backSurMesure: this.avgField(metrics, 'backSurMesure'),
+        equipeCdP: this.avgField(metrics, 'equipeCdP'),
+        equipeDesign: this.avgField(metrics, 'equipeDesign'),
+        absences: this.avgField(metrics, 'absences'),
+        interne: this.avgField(metrics, 'interne'),
+        nonAffected: this.avgField(metrics, 'nonAffected'),
+        prevision: this.avgField(metrics, 'prevision'),
+        cumulativeAbsences: this.avgField(metrics, 'cumulativeAbsences'),
+        cumulativeInterne: this.avgField(metrics, 'cumulativeInterne'),
+        cumulativeNonAffected: this.avgField(metrics, 'cumulativeNonAffected'),
+        cumulativePrevision: this.avgField(metrics, 'cumulativePrevision'),
+        frontEcommerceAbsences: this.avgField(metrics, 'frontEcommerceAbsences'),
+        frontEcommerceNonAffected: this.avgField(metrics, 'frontEcommerceNonAffected'),
+        frontEcommercePrevision: this.avgField(metrics, 'frontEcommercePrevision'),
+        backEcommerceAbsences: this.avgField(metrics, 'backEcommerceAbsences'),
+        backEcommerceNonAffected: this.avgField(metrics, 'backEcommerceNonAffected'),
+        backEcommercePrevision: this.avgField(metrics, 'backEcommercePrevision'),
+        frontSurMesureAbsences: this.avgField(metrics, 'frontSurMesureAbsences'),
+        frontSurMesureNonAffected: this.avgField(metrics, 'frontSurMesureNonAffected'),
+        frontSurMesurePrevision: this.avgField(metrics, 'frontSurMesurePrevision'),
+        backSurMesureAbsences: this.avgField(metrics, 'backSurMesureAbsences'),
+        backSurMesureNonAffected: this.avgField(metrics, 'backSurMesureNonAffected'),
+        backSurMesurePrevision: this.avgField(metrics, 'backSurMesurePrevision'),
+        cumulativeFrontEcommerceAbsences: this.avgField(metrics, 'cumulativeFrontEcommerceAbsences'),
+        cumulativeFrontEcommerceNonAffected: this.avgField(metrics, 'cumulativeFrontEcommerceNonAffected'),
+        cumulativeFrontEcommercePrevision: this.avgField(metrics, 'cumulativeFrontEcommercePrevision'),
+        cumulativeBackEcommerceAbsences: this.avgField(metrics, 'cumulativeBackEcommerceAbsences'),
+        cumulativeBackEcommerceNonAffected: this.avgField(metrics, 'cumulativeBackEcommerceNonAffected'),
+        cumulativeBackEcommercePrevision: this.avgField(metrics, 'cumulativeBackEcommercePrevision'),
+        cumulativeFrontSurMesureAbsences: this.avgField(metrics, 'cumulativeFrontSurMesureAbsences'),
+        cumulativeFrontSurMesureNonAffected: this.avgField(metrics, 'cumulativeFrontSurMesureNonAffected'),
+        cumulativeFrontSurMesurePrevision: this.avgField(metrics, 'cumulativeFrontSurMesurePrevision'),
+        cumulativeBackSurMesureAbsences: this.avgField(metrics, 'cumulativeBackSurMesureAbsences'),
+        cumulativeBackSurMesureNonAffected: this.avgField(metrics, 'cumulativeBackSurMesureNonAffected'),
+        cumulativeBackSurMesurePrevision: this.avgField(metrics, 'cumulativeBackSurMesurePrevision'),
+        sortKey
+      };
+      consolidated.push(avgMetric);
+    });
+
+    // Trier chronologiquement par sortKey (format YYYY-MM-DD) pour garantir l'ordre correct
+    consolidated.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+
+    // Retirer la clé de tri avant de retourner
+    return consolidated.map(({ sortKey, ...metric }) => metric);
+  }
+
+  /**
+   * Calcule la moyenne d'un champ pour un tableau de métriques
+   */
+  private avgField(metrics: DailyMetrics[], field: keyof DailyMetrics): number {
+    const values = metrics.map(m => m[field] as number);
+    const sum = values.reduce((acc, val) => acc + val, 0);
+    return sum / values.length;
+  }
+
+  /**
    * Calcule les statistiques de jours planifiés par projet et par équipe
    * Compte le nombre de demi-journées pour chaque projet, ventilées par équipe
    */

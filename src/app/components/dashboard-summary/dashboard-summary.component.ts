@@ -2,8 +2,8 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MonthlyActivityChartComponent } from '../monthly-activity-chart/monthly-activity-chart.component';
-import { ProjectStatistics } from '../../services/activity-rate.service';
+import { ActivityChartComponent } from '../activity-chart/activity-chart.component';
+import { ProjectStatistics, DailyMetrics } from '../../services/activity-rate.service';
 
 export interface MonthlySummary {
   month: string;
@@ -26,23 +26,13 @@ export interface MonthlySummary {
 @Component({
   selector: 'app-dashboard-summary',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatTooltipModule, MonthlyActivityChartComponent],
+  imports: [CommonModule, MatCardModule, MatTooltipModule, ActivityChartComponent],
   templateUrl: './dashboard-summary.component.html',
   styleUrl: './dashboard-summary.component.scss'
 })
 export class DashboardSummaryComponent {
   @Input() monthlySummaries: MonthlySummary[] = [];
-
-  /**
-   * Transforme les monthlySummaries en données pour le graphique
-   */
-  get monthlyChartData() {
-    return this.monthlySummaries.map(summary => ({
-      month: summary.month,
-      realRate: summary.totalMetrics.realRate,
-      estimatedRate: summary.totalMetrics.estimatedRate
-    }));
-  }
+  @Input() consolidatedDailyMetrics: DailyMetrics[] = [];
 
   /**
    * Retourne la classe CSS en fonction du taux d'activité

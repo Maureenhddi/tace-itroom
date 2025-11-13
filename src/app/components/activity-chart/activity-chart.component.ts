@@ -73,48 +73,61 @@ export class ActivityChartComponent implements OnInit, OnChanges {
       return;
     }
 
-    // Agréger les données par jour complet (moyenne matin + après-midi)
-    const aggregatedData = this.activityRateService.aggregateDailyMetrics(this.dailyMetrics);
+    // Les données sont déjà agrégées par jour complet depuis consolidateAllDailyMetrics()
+    this.lineChartData.labels = this.dailyMetrics.map(d => d.date);
 
-    // Labels = dates agrégées
-    this.lineChartData.labels = aggregatedData.map(d => d.date);
+    // Calculer les taux d'activité pour chaque jour
+    const chartData = this.calculateChartData();
 
     if (this.chartType === 'expertise') {
-      // Graphique 1 : E-commerce vs Sur mesure (global)
-      const ecommerceData = aggregatedData.map(d => d.ecommerceRate);
-      const surMesureData = aggregatedData.map(d => d.surMesureRate);
-
       this.lineChartData.datasets = [
-        this.createDataset(ecommerceData, 'E-commerce', '#1e87f0'),
-        this.createDataset(surMesureData, 'Sur mesure', '#f59c16')
+        this.createDataset(chartData.data1, chartData.label1, '#1e87f0'),
+        this.createDataset(chartData.data2, chartData.label2, '#f59c16')
       ];
-
-      this.insights = this.generateExpertiseInsights(ecommerceData, surMesureData);
+      this.insights = this.generateExpertiseInsights(chartData.data1, chartData.data2);
     } else if (this.chartType === 'ecommerce-teams') {
-      // Graphique 2 : E-commerce Front vs Back
-      const ecommerceFrontData = aggregatedData.map(d => d.ecommerceFrontRate);
-      const ecommerceBackData = aggregatedData.map(d => d.ecommerceBackRate);
-
       this.lineChartData.datasets = [
-        this.createDataset(ecommerceFrontData, 'E-commerce Front', '#1e87f0'),
-        this.createDataset(ecommerceBackData, 'E-commerce Back', '#f59c16')
+        this.createDataset(chartData.data1, chartData.label1, '#1e87f0'),
+        this.createDataset(chartData.data2, chartData.label2, '#f59c16')
       ];
-
-      this.insights = this.generateTeamInsights('E-commerce', ecommerceFrontData, ecommerceBackData);
+      this.insights = this.generateTeamInsights('E-commerce', chartData.data1, chartData.data2);
     } else if (this.chartType === 'surmesure-teams') {
-      // Graphique 3 : Sur mesure Front vs Back
-      const surMesureFrontData = aggregatedData.map(d => d.surMesureFrontRate);
-      const surMesureBackData = aggregatedData.map(d => d.surMesureBackRate);
-
       this.lineChartData.datasets = [
-        this.createDataset(surMesureFrontData, 'Sur mesure Front', '#1e87f0'),
-        this.createDataset(surMesureBackData, 'Sur mesure Back', '#f59c16')
+        this.createDataset(chartData.data1, chartData.label1, '#1e87f0'),
+        this.createDataset(chartData.data2, chartData.label2, '#f59c16')
       ];
-
-      this.insights = this.generateTeamInsights('Sur mesure', surMesureFrontData, surMesureBackData);
+      this.insights = this.generateTeamInsights('Sur mesure', chartData.data1, chartData.data2);
     }
 
     this.chart?.update();
+  }
+
+  /**
+   * Calcule les données du graphique en fonction du type
+   */
+  private calculateChartData(): { data1: number[], data2: number[], label1: string, label2: string } {
+    if (this.chartType === 'expertise') {
+      return {
+        data1: this.dailyMetrics.map(d => this.activityRateService.calculateEcommerceActivityRate(d)),
+        data2: this.dailyMetrics.map(d => this.activityRateService.calculateSurMesureActivityRate(d)),
+        label1: 'E-commerce',
+        label2: 'Sur mesure'
+      };
+    } else if (this.chartType === 'ecommerce-teams') {
+      return {
+        data1: this.dailyMetrics.map(d => this.activityRateService.calculateEcommerceFrontActivityRate(d)),
+        data2: this.dailyMetrics.map(d => this.activityRateService.calculateEcommerceBackActivityRate(d)),
+        label1: 'E-commerce Front',
+        label2: 'E-commerce Back'
+      };
+    } else { // surmesure-teams
+      return {
+        data1: this.dailyMetrics.map(d => this.activityRateService.calculateSurMesureFrontActivityRate(d)),
+        data2: this.dailyMetrics.map(d => this.activityRateService.calculateSurMesureBackActivityRate(d)),
+        label1: 'Sur mesure Front',
+        label2: 'Sur mesure Back'
+      };
+    }
   }
 
   /**

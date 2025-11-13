@@ -62,7 +62,10 @@
               </div>
             } @else if (i === 0) {
               <!-- Onglet Tableau de bord -->
-              <app-dashboard-summary [monthlySummaries]="monthlySummaries"></app-dashboard-summary>
+              <app-dashboard-summary
+                [monthlySummaries]="monthlySummaries"
+                [consolidatedDailyMetrics]="consolidatedDailyMetrics">
+              </app-dashboard-summary>
             } @else if (i === 1 && monthlySummaries.length > 0) {
               <!-- Onglet Projets avec sous-onglets par mois -->
               <mat-tab-group class="sub-tabs-container">
@@ -80,29 +83,6 @@
               <mat-tab-group class="sub-tabs-container">
                 @for (monthData of tab.monthlyData; track monthData.month) {
                   <mat-tab [label]="monthData.month">
-                    <!-- Afficher les graphiques uniquement pour l'onglet "Visualisation TACE" (index 4) -->
-                    @if (i === 4 && monthData.dailyMetrics && monthData.dailyMetrics.length > 0) {
-                      <div class="charts-section">
-                        <app-activity-chart
-                          [dailyMetrics]="monthData.dailyMetrics"
-                          [chartType]="'expertise'"
-                          [title]="'Taux d\'activité réel - E-commerce vs Sur mesure'">
-                        </app-activity-chart>
-
-                        <app-activity-chart
-                          [dailyMetrics]="monthData.dailyMetrics"
-                          [chartType]="'ecommerce-teams'"
-                          [title]="'Taux d\'activité réel E-commerce - Front vs Back'">
-                        </app-activity-chart>
-
-                        <app-activity-chart
-                          [dailyMetrics]="monthData.dailyMetrics"
-                          [chartType]="'surmesure-teams'"
-                          [title]="'Taux d\'activité réel Sur mesure - Front vs Back'">
-                        </app-activity-chart>
-                      </div>
-                    }
-
                     <app-data-table
                       [data]="monthData.data"
                       [displayedColumns]="monthData.displayedColumns"

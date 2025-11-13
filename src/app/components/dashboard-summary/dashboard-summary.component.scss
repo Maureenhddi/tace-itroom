@@ -360,3 +360,46 @@ $dark-shadow: rgba(0, 0, 0, 0.5);
     margin-right: auto;
   }
 }
+
+// Styles pour les graphiques consolidés
+.consolidated-charts-section {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: $itroom-bg-muted;
+  border-radius: 12px;
+
+  h2.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $itroom-blue;
+    margin-bottom: 2rem;
+    text-align: center;
+    border-bottom: 3px solid $itroom-blue;
+    padding-bottom: 1rem;
+  }
+
+  app-activity-chart {
+    display: block;
+    margin-bottom: 2rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  @media (min-width: 768px) {
+    padding: 3rem;
+  }
+}
+
+// Dark mode pour les graphiques consolidés
+::ng-deep body.dark-theme {
+  .consolidated-charts-section {
+    background: rgba($dark-card-bg, 0.5);
+
+    h2.section-title {
+      color: $itroom-blue-light;
+      border-color: $itroom-blue-light;
+    }
+  }
+}

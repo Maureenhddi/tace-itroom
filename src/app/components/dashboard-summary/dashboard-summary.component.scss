@@ -172,6 +172,16 @@ $dark-shadow: rgba(0, 0, 0, 0.5);
   gap: 1rem;
 }
 
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
 .metric-item {
   display: flex;
   flex-direction: column;

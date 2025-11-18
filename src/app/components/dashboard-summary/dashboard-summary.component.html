@@ -22,32 +22,25 @@
             </div>
           </div>
 
-          <!-- Taux par équipe -->
+          <!-- Taux par équipe spécifique -->
           <div class="metric-section">
-            <h3 class="section-title">Par Équipe</h3>
-            <div class="metrics-row">
-              <div class="metric-item team-front" [ngClass]="getRateClass(summary.teamMetrics.frontRate)">
-                <span class="metric-label">Front</span>
-                <span class="metric-value">{{ summary.teamMetrics.frontRate }}%</span>
+            <h3 class="section-title">Taux Réel par Équipe</h3>
+            <div class="metrics-grid">
+              <div class="metric-item team-front-ecommerce" [ngClass]="getRateClass(summary.specificTeamMetrics.frontEcommerceRate)">
+                <span class="metric-label">Front E-commerce</span>
+                <span class="metric-value">{{ summary.specificTeamMetrics.frontEcommerceRate }}%</span>
               </div>
-              <div class="metric-item team-back" [ngClass]="getRateClass(summary.teamMetrics.backRate)">
-                <span class="metric-label">Back</span>
-                <span class="metric-value">{{ summary.teamMetrics.backRate }}%</span>
+              <div class="metric-item team-back-ecommerce" [ngClass]="getRateClass(summary.specificTeamMetrics.backEcommerceRate)">
+                <span class="metric-label">Back E-commerce</span>
+                <span class="metric-value">{{ summary.specificTeamMetrics.backEcommerceRate }}%</span>
               </div>
-            </div>
-          </div>
-
-          <!-- Taux par expertise -->
-          <div class="metric-section">
-            <h3 class="section-title">Par Expertise</h3>
-            <div class="metrics-row">
-              <div class="metric-item expertise-ecommerce" [ngClass]="getRateClass(summary.expertiseMetrics.ecommerceRate)">
-                <span class="metric-label">E-commerce</span>
-                <span class="metric-value">{{ summary.expertiseMetrics.ecommerceRate }}%</span>
+              <div class="metric-item team-front-surmesure" [ngClass]="getRateClass(summary.specificTeamMetrics.frontSurMesureRate)">
+                <span class="metric-label">Front Sur mesure</span>
+                <span class="metric-value">{{ summary.specificTeamMetrics.frontSurMesureRate }}%</span>
               </div>
-              <div class="metric-item expertise-surmesure" [ngClass]="getRateClass(summary.expertiseMetrics.surMesureRate)">
-                <span class="metric-label">Sur mesure</span>
-                <span class="metric-value">{{ summary.expertiseMetrics.surMesureRate }}%</span>
+              <div class="metric-item team-back-surmesure" [ngClass]="getRateClass(summary.specificTeamMetrics.backSurMesureRate)">
+                <span class="metric-label">Back Sur mesure</span>
+                <span class="metric-value">{{ summary.specificTeamMetrics.backSurMesureRate }}%</span>
               </div>
             </div>
           </div>

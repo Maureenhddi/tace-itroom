@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { GoogleSheetsService } from './services/google-sheets.service';
 import { ThemeService } from './services/theme.service';
 import { ActivityRateService, MonthData, TeamMetrics, ExpertiseMetrics, DailyMetrics } from './services/activity-rate.service';
+import { DataCacheService } from './services/data-cache.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -65,12 +66,12 @@ export class AppComponent implements OnInit {
   selectedTabIndex = 0;
   monthlySummaries: MonthlySummary[] = [];
   consolidatedDailyMetrics: DailyMetrics[] = [];
-  private totalRatesByMonth: Map<string, { realRate: number; estimatedRate: number }> = new Map();
 
   constructor(
     private googleSheetsService: GoogleSheetsService,
     private themeService: ThemeService,
     private activityRateService: ActivityRateService,
+    private dataCacheService: DataCacheService,
     private cdr: ChangeDetectorRef,
     private router: Router
   ) {
@@ -212,7 +213,9 @@ export class AppComponent implements OnInit {
             tabExpertise.monthlyData = [];
             tabDaily.monthlyData = [];
             this.monthlySummaries = [];
-            this.totalRatesByMonth.clear();
+
+            // Vider le cache au début du chargement
+            this.dataCacheService.clearCache();
 
             // Filtrer les résultats pour ne garder que les onglets avec des données valides
             const validResults = results.filter(({ month, data }) => {
@@ -233,30 +236,22 @@ export class AppComponent implements OnInit {
             });
 
             validResults.forEach(({ month, data }) => {
-              // Utiliser les jours ouvrés configurés dans le service
-              const totalRates = this.processMonthData(month, data);
-              if (totalRates) {
-                this.totalRatesByMonth.set(month, totalRates);
+              // Vérifier si les données sont déjà en cache
+              if (!this.dataCacheService.hasMonthData(month)) {
+                // Calculer toutes les données du mois et les mettre en cache
+                this.calculateAndCacheMonthData(month, data);
               }
-              this.processMonthDataExpertise(month, data);
-              this.processMonthDataDaily(month, data);
+
+              // Utiliser les données du cache pour peupler les onglets
+              this.populateTabsFromCache(month);
             });
 
             if (validResults.length === 0) {
               this.error = 'Aucun mois avec des données valides trouvé';
             }
 
-            // Consolider toutes les métriques quotidiennes de tous les mois
-            const allMonthlyMetrics = tabDaily.monthlyData
-              ?.filter(monthData => monthData.dailyMetrics && monthData.dailyMetrics.length > 0)
-              .map(monthData => ({
-                month: monthData.month,
-                dailyMetrics: monthData.dailyMetrics!
-              })) || [];
-
-            if (allMonthlyMetrics.length > 0) {
-              this.consolidatedDailyMetrics = this.activityRateService.consolidateAllDailyMetrics(allMonthlyMetrics);
-            }
+            // Récupérer toutes les métriques quotidiennes consolidées depuis le cache
+            this.consolidatedDailyMetrics = this.dataCacheService.getConsolidatedDailyMetrics();
 
             tabDashboard.loading = false;
             tabProjets.loading = false;
@@ -279,15 +274,97 @@ export class AppComponent implements OnInit {
     });
   }
 
-  processMonthData(monthName: string, sheetData: (string | number)[][]) {
-    // Calculer les métriques avec le service (en DEMI-JOURNÉES)
+  /**
+   * Calcule toutes les données d'un mois et les met en cache
+   */
+  calculateAndCacheMonthData(monthName: string, sheetData: (string | number)[][]) {
     const monthData: MonthData = {
       month: monthName,
       workingDays: this.activityRateService.getWorkingDays(monthName),
       sheetData
     };
 
-    const metrics = this.activityRateService.calculateTeamMetrics(monthData);
+    // Calculer toutes les métriques en une seule fois
+    const teamMetrics = this.activityRateService.calculateTeamMetrics(monthData);
+    const expertiseMetrics = this.activityRateService.calculateExpertiseMetrics(monthData);
+    const dailyMetrics = this.activityRateService.calculateDailyMetrics(monthData);
+
+    // Calculer les taux totaux (équipe)
+    const totalCDS = teamMetrics.find(m => m.teamName === 'Total CDS');
+    const capaciteTheorique = monthData.workingDays * (totalCDS?.collaboratorCount || 0);
+    const capaciteReelle = capaciteTheorique - (totalCDS?.absenceDays || 0);
+
+    const totalRealRate = capaciteReelle > 0
+      ? ((capaciteTheorique - (totalCDS?.absenceDays || 0) - (totalCDS?.nonAffectedDays || 0) - (totalCDS?.previsionDays || 0)) / capaciteReelle) * 100
+      : 0;
+
+    const totalEstimatedRate = capaciteReelle > 0
+      ? ((capaciteTheorique - (totalCDS?.absenceDays || 0) - (totalCDS?.nonAffectedDays || 0)) / capaciteReelle) * 100
+      : 0;
+
+    // Calculer les taux par expertise (ces calculs seront faits dans transformExpertiseMetricsToMonthlyData)
+    // Pour l'instant, on initialise avec des valeurs par défaut
+    const expertiseRates = {
+      frontEcommerceRate: 0,
+      backEcommerceRate: 0,
+      frontSurMesureRate: 0,
+      backSurMesureRate: 0
+    };
+
+    // Extraire les projets et calculer les statistiques
+    const projects = this.activityRateService.extractProjectsFromMonth(monthData);
+    const projectStats = this.activityRateService.calculateProjectStatistics(monthData);
+
+    // Stocker dans le cache
+    this.dataCacheService.setMonthData(monthName, {
+      monthName,
+      expertiseMetrics,
+      teamMetrics,
+      dailyMetrics,
+      expertiseRates, // Sera mis à jour par transformExpertiseMetricsToMonthlyData
+      totalRates: {
+        realRate: Math.round(totalRealRate * 100) / 100,
+        estimatedRate: Math.round(totalEstimatedRate * 100) / 100
+      },
+      projects,
+      projectStats,
+      workingDays: monthData.workingDays,
+      calculatedAt: new Date()
+    });
+
+    // Calculer et mettre à jour les taux d'expertise
+    const monthlyMetrics: MonthlyMetrics = {
+      month: monthName,
+      data: [],
+      displayedColumns: ['col0', 'col1'],
+      headers: ['', '']
+    };
+    this.transformExpertiseMetricsToMonthlyData(monthlyMetrics, expertiseMetrics, teamMetrics, monthName);
+  }
+
+  /**
+   * Peuple les onglets à partir des données en cache
+   */
+  populateTabsFromCache(monthName: string) {
+    const cachedData = this.dataCacheService.getMonthData(monthName);
+    if (!cachedData) return;
+
+    // Peupler l'onglet "Par Équipe"
+    this.processMonthData(monthName, []);
+
+    // Peupler l'onglet "Par Expertise"
+    this.processMonthDataExpertise(monthName, []);
+
+    // Peupler l'onglet "Daily"
+    this.processMonthDataDaily(monthName, []);
+  }
+
+  processMonthData(monthName: string, sheetData: (string | number)[][]) {
+    // Récupérer les métriques depuis le cache
+    const cachedData = this.dataCacheService.getMonthData(monthName);
+    if (!cachedData) return null;
+
+    const metrics = cachedData.teamMetrics;
 
     // Créer les données du tableau pour ce mois
     const monthlyMetrics: MonthlyMetrics = {
@@ -685,15 +762,12 @@ export class AppComponent implements OnInit {
   }
 
   processMonthDataExpertise(monthName: string, sheetData: (string | number)[][]) {
-    // Calculer les métriques d'expertise avec le service (en DEMI-JOURNÉES)
-    const monthData: MonthData = {
-      month: monthName,
-      workingDays: this.activityRateService.getWorkingDays(monthName),
-      sheetData
-    };
+    // Récupérer les métriques depuis le cache
+    const cachedData = this.dataCacheService.getMonthData(monthName);
+    if (!cachedData) return;
 
-    const expertiseMetrics = this.activityRateService.calculateExpertiseMetrics(monthData);
-    const teamMetrics = this.activityRateService.calculateTeamMetrics(monthData);
+    const expertiseMetrics = cachedData.expertiseMetrics;
+    const teamMetrics = cachedData.teamMetrics;
 
     // Créer les données du tableau pour ce mois
     const monthlyMetrics: MonthlyMetrics = {
@@ -737,6 +811,14 @@ export class AppComponent implements OnInit {
     const frontSurMesure = expertiseMetrics.find(m => m.expertiseName === 'Front Sur mesure');
     const backEcommerce = expertiseMetrics.find(m => m.expertiseName === 'Back E-commerce');
     const backSurMesure = expertiseMetrics.find(m => m.expertiseName === 'Back Sur mesure');
+
+    // Initialiser les taux pour le tableau de bord
+    const dashboardRates = {
+      frontEcommerceRate: 0,
+      backEcommerceRate: 0,
+      frontSurMesureRate: 0,
+      backSurMesureRate: 0
+    };
 
     monthlyMetrics.data.push({
       col0: 'Nombre collab CDS',
@@ -888,6 +970,9 @@ export class AppComponent implements OnInit {
         ? ((joursAProduire - frontEcommerce.absenceDays - frontEcommerce.nonAffectedDays - frontEcommerce.previsionDays) / capaciteReelle) * 100
         : 0;
 
+      // Stocker le taux réel pour le tableau de bord
+      dashboardRates.frontEcommerceRate = Math.round(tauxReel * 10) / 10;
+
       // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité réel global',
@@ -949,6 +1034,9 @@ export class AppComponent implements OnInit {
       const tauxReel = capaciteReelle > 0
         ? ((joursAProduire - backEcommerce.absenceDays - backEcommerce.nonAffectedDays - backEcommerce.previsionDays) / capaciteReelle) * 100
         : 0;
+
+      // Stocker le taux réel pour le tableau de bord
+      dashboardRates.backEcommerceRate = Math.round(tauxReel * 10) / 10;
 
       // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
       monthlyMetrics.data.push({
@@ -1012,6 +1100,9 @@ export class AppComponent implements OnInit {
         ? ((joursAProduire - frontSurMesure.absenceDays - frontSurMesure.nonAffectedDays - frontSurMesure.previsionDays) / capaciteReelle) * 100
         : 0;
 
+      // Stocker le taux réel pour le tableau de bord
+      dashboardRates.frontSurMesureRate = Math.round(tauxReel * 10) / 10;
+
       // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité réel global',
@@ -1074,6 +1165,9 @@ export class AppComponent implements OnInit {
         ? ((joursAProduire - backSurMesure.absenceDays - backSurMesure.nonAffectedDays - backSurMesure.previsionDays) / capaciteReelle) * 100
         : 0;
 
+      // Stocker le taux réel pour le tableau de bord
+      dashboardRates.backSurMesureRate = Math.round(tauxReel * 10) / 10;
+
       // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité réel global',
@@ -1113,17 +1207,21 @@ export class AppComponent implements OnInit {
         isCustomRow: true
       });
     }
+
+    // Mettre à jour le cache avec les taux d'expertise calculés
+    const cachedData = this.dataCacheService.getMonthData(monthName);
+    if (cachedData) {
+      cachedData.expertiseRates = dashboardRates;
+      this.dataCacheService.setMonthData(monthName, cachedData);
+    }
   }
 
   processMonthDataDaily(monthName: string, sheetData: (string | number)[][]) {
-    // Calculer les métriques quotidiennes avec le service
-    const monthData: MonthData = {
-      month: monthName,
-      workingDays: this.activityRateService.getWorkingDays(monthName),
-      sheetData
-    };
+    // Récupérer les métriques depuis le cache
+    const cachedData = this.dataCacheService.getMonthData(monthName);
+    if (!cachedData) return;
 
-    const dailyMetrics = this.activityRateService.calculateDailyMetrics(monthData);
+    const dailyMetrics = cachedData.dailyMetrics;
 
     // Créer les données du tableau pour ce mois
     const monthlyMetrics: MonthlyMetrics = {
@@ -1140,32 +1238,16 @@ export class AppComponent implements OnInit {
     // Ajouter à l'onglet daily
     this.tabs[4].monthlyData!.push(monthlyMetrics);
 
-    // Calculer le résumé mensuel pour le tableau de bord
-    const summary = this.activityRateService.calculateMonthlySummary(dailyMetrics);
-    const totalRates = this.totalRatesByMonth.get(monthName);
-
-    // Extraire les projets uniques pour ce mois
-    const projects = this.activityRateService.extractProjectsFromMonth(monthData);
-
-    // Calculer les statistiques détaillées par projet
-    const projectStats = this.activityRateService.calculateProjectStatistics(monthData);
+    // Récupérer les taux et projets depuis le cache
+    const cached = this.dataCacheService.getMonthData(monthName);
+    if (!cached) return;
 
     this.monthlySummaries.push({
       month: monthName,
-      totalMetrics: {
-        realRate: totalRates?.realRate || 0,
-        estimatedRate: totalRates?.estimatedRate || 0
-      },
-      teamMetrics: {
-        frontRate: summary.frontRate,
-        backRate: summary.backRate
-      },
-      expertiseMetrics: {
-        ecommerceRate: summary.ecommerceRate,
-        surMesureRate: summary.surMesureRate
-      },
-      projects: projects,
-      projectStats: projectStats
+      totalMetrics: cached.totalRates,
+      specificTeamMetrics: cached.expertiseRates,
+      projects: cached.projects,
+      projectStats: cached.projectStats
     });
   }
 

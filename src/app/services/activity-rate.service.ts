@@ -1004,35 +1004,35 @@ export class ActivityRateService {
 
   /**
    * Calcule le résumé mensuel des taux d'activité à partir des métriques quotidiennes
-   * Retourne la moyenne des taux d'activité réel par équipe et par expertise pour tout le mois
+   * Retourne la moyenne des taux d'activité réel par équipe spécifique pour tout le mois
    */
   calculateMonthlySummary(dailyMetrics: DailyMetrics[]): {
-    frontRate: number;
-    backRate: number;
-    ecommerceRate: number;
-    surMesureRate: number;
+    frontEcommerceRate: number;
+    backEcommerceRate: number;
+    frontSurMesureRate: number;
+    backSurMesureRate: number;
   } {
     if (!dailyMetrics || dailyMetrics.length === 0) {
       return {
-        frontRate: 0,
-        backRate: 0,
-        ecommerceRate: 0,
-        surMesureRate: 0
+        frontEcommerceRate: 0,
+        backEcommerceRate: 0,
+        frontSurMesureRate: 0,
+        backSurMesureRate: 0
       };
     }
 
-    // Calculer les taux pour chaque demi-journée
-    const frontRates = dailyMetrics.map(m => this.calculateFrontActivityRate(m));
-    const backRates = dailyMetrics.map(m => this.calculateBackActivityRate(m));
-    const ecommerceRates = dailyMetrics.map(m => this.calculateEcommerceActivityRate(m));
-    const surMesureRates = dailyMetrics.map(m => this.calculateSurMesureActivityRate(m));
+    // Calculer les taux pour chaque demi-journée par équipe spécifique
+    const frontEcommerceRates = dailyMetrics.map(m => this.calculateEcommerceFrontActivityRate(m));
+    const backEcommerceRates = dailyMetrics.map(m => this.calculateEcommerceBackActivityRate(m));
+    const frontSurMesureRates = dailyMetrics.map(m => this.calculateSurMesureFrontActivityRate(m));
+    const backSurMesureRates = dailyMetrics.map(m => this.calculateSurMesureBackActivityRate(m));
 
     // Calculer la moyenne pour le mois
     return {
-      frontRate: Math.round((frontRates.reduce((a, b) => a + b, 0) / frontRates.length) * 100) / 100,
-      backRate: Math.round((backRates.reduce((a, b) => a + b, 0) / backRates.length) * 100) / 100,
-      ecommerceRate: Math.round((ecommerceRates.reduce((a, b) => a + b, 0) / ecommerceRates.length) * 100) / 100,
-      surMesureRate: Math.round((surMesureRates.reduce((a, b) => a + b, 0) / surMesureRates.length) * 100) / 100
+      frontEcommerceRate: Math.round((frontEcommerceRates.reduce((a, b) => a + b, 0) / frontEcommerceRates.length) * 100) / 100,
+      backEcommerceRate: Math.round((backEcommerceRates.reduce((a, b) => a + b, 0) / backEcommerceRates.length) * 100) / 100,
+      frontSurMesureRate: Math.round((frontSurMesureRates.reduce((a, b) => a + b, 0) / frontSurMesureRates.length) * 100) / 100,
+      backSurMesureRate: Math.round((backSurMesureRates.reduce((a, b) => a + b, 0) / backSurMesureRates.length) * 100) / 100
     };
   }
 

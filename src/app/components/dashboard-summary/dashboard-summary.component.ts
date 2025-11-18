@@ -11,13 +11,11 @@ export interface MonthlySummary {
     realRate: number;
     estimatedRate: number;
   };
-  teamMetrics: {
-    frontRate: number;
-    backRate: number;
-  };
-  expertiseMetrics: {
-    ecommerceRate: number;
-    surMesureRate: number;
+  specificTeamMetrics: {
+    frontEcommerceRate: number;
+    backEcommerceRate: number;
+    frontSurMesureRate: number;
+    backSurMesureRate: number;
   };
   projects: string[]; // Liste des projets du mois
   projectStats: ProjectStatistics[]; // Statistiques détaillées par projet

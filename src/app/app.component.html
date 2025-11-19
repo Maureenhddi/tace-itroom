@@ -66,7 +66,7 @@
                 [monthlySummaries]="monthlySummaries"
                 [consolidatedDailyMetrics]="consolidatedDailyMetrics">
               </app-dashboard-summary>
-            } @else if (i === 1 && monthlySummaries.length > 0) {
+            } @else if (i === 4 && monthlySummaries.length > 0) {
               <!-- Onglet Projets avec sous-onglets par mois -->
               <mat-tab-group class="sub-tabs-container">
                 @for (summary of monthlySummaries; track summary.month) {

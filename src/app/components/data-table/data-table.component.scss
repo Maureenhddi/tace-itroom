@@ -344,3 +344,39 @@ $dark-shadow: rgba(0, 0, 0, 0.5);
     }
   }
 }
+
+// Style pour le bouton de collapse
+.collapse-button {
+  margin-right: 8px;
+  vertical-align: middle;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+  }
+}
+
+// Style pour les lignes collapsibles
+tr.collapsible-row {
+  cursor: pointer;
+
+  td:first-child {
+    font-weight: 600;
+  }
+
+  &:hover {
+    td {
+      background-color: lighten($itroom-blue, 50%) !important;
+    }
+  }
+}
+
+::ng-deep body.dark-theme {
+  tr.collapsible-row:hover {
+    td {
+      background-color: rgba($itroom-blue, 0.3) !important;
+    }
+  }
+}

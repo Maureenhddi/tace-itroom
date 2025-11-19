@@ -43,6 +43,17 @@ $dark-shadow: rgba(0, 0, 0, 0.5);
   }
 }
 
+// Barre de recherche
+.search-field {
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
+}
+
 // Carte des filtres et statistiques
 .filters-card {
   background: $itroom-bg;

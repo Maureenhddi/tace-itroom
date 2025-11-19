@@ -4,6 +4,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
 import { ProjectStatistics } from '../../services/activity-rate.service';
 
 @Component({
@@ -13,7 +16,10 @@ import { ProjectStatistics } from '../../services/activity-rate.service';
     CommonModule,
     MatCardModule,
     MatTableModule,
-    MatSortModule
+    MatSortModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule
   ],
   templateUrl: './projects-overview.component.html',
   styleUrl: './projects-overview.component.scss'
@@ -27,6 +33,8 @@ export class ProjectsOverviewComponent implements OnChanges {
   displayedColumns: string[] = ['projectName', 'totalDays', 'frontDays', 'backDays', 'cdpDays', 'designDays'];
 
   dataSource: MatTableDataSource<ProjectStatistics> = new MatTableDataSource<ProjectStatistics>([]);
+
+  searchText: string = '';
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['projectStats']) {
@@ -43,6 +51,20 @@ export class ProjectsOverviewComponent implements OnChanges {
 
     this.dataSource = new MatTableDataSource(sortedProjects);
     this.dataSource.sort = this.sort;
+
+    // Configurer le filtre pour chercher dans le nom du projet
+    this.dataSource.filterPredicate = (data: ProjectStatistics, filter: string) => {
+      return data.projectName.toLowerCase().includes(filter.toLowerCase());
+    };
+  }
+
+  /**
+   * Applique le filtre de recherche
+   */
+  applyFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.searchText = filterValue;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
   /**

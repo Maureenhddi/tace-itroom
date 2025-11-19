@@ -2,11 +2,18 @@
   <mat-card class="table-card">
     <mat-card-content>
       <div class="table-container">
-        <table mat-table [dataSource]="data" class="mat-elevation-z8">
+        <table mat-table [dataSource]="getVisibleData()" class="mat-elevation-z8">
           @for (column of displayedColumns; track column) {
             <ng-container [matColumnDef]="column">
               <th mat-header-cell *matHeaderCellDef>{{ getColumnHeader(column) }}</th>
-              <td mat-cell *matCellDef="let element" [ngClass]="getRateClass(element[column])">{{ element[column] }}</td>
+              <td mat-cell *matCellDef="let element" [ngClass]="getRateClass(element[column])">
+                @if (column === 'col0' && element.isCollapsible) {
+                  <button (click)="toggleSection(element.sectionId); $event.stopPropagation()" class="collapse-button" style="cursor: pointer; background: blue; color: white; padding: 4px 8px; border: none; border-radius: 4px;">
+                    {{ isSectionCollapsed(element.sectionId) ? '▼' : '▲' }}
+                  </button>
+                }
+                {{ element[column] }}
+              </td>
             </ng-container>
           }
 
@@ -15,7 +22,8 @@
               [class.custom-row]="row.isCustomRow"
               [class.sub-row]="row.isSubRow"
               [class.title-row]="row.isTitleRow"
-              [class.rate-row]="row.isRateRow"></tr>
+              [class.rate-row]="row.isRateRow"
+              [class.collapsible-row]="row.isCollapsible"></tr>
         </table>
       </div>
     </mat-card-content>

@@ -131,14 +131,6 @@ export class AppComponent implements OnInit {
         monthlyData: []
       },
       {
-        name: 'PROJETS',
-        data: [],
-        displayedColumns: [],
-        headers: [],
-        loading: true,
-        monthlyData: []
-      },
-      {
         name: 'TAUX D\'ACTIVITÉ PAR ÉQUIPE',
         data: [],
         displayedColumns: [],
@@ -156,6 +148,14 @@ export class AppComponent implements OnInit {
       },
       {
         name: 'Visualisation TACE',
+        data: [],
+        displayedColumns: [],
+        headers: [],
+        loading: true,
+        monthlyData: []
+      },
+      {
+        name: 'PROJETS',
         data: [],
         displayedColumns: [],
         headers: [],
@@ -205,10 +205,10 @@ export class AppComponent implements OnInit {
         forkJoin(monthRequests).subscribe({
           next: (results) => {
             const tabDashboard = this.tabs[0];
-            const tabProjets = this.tabs[1];
-            const tabEquipe = this.tabs[2];
-            const tabExpertise = this.tabs[3];
-            const tabDaily = this.tabs[4];
+            const tabEquipe = this.tabs[1];
+            const tabExpertise = this.tabs[2];
+            const tabDaily = this.tabs[3];
+            const tabProjets = this.tabs[4];
             tabEquipe.monthlyData = [];
             tabExpertise.monthlyData = [];
             tabDaily.monthlyData = [];
@@ -378,7 +378,7 @@ export class AppComponent implements OnInit {
     const totalRates = this.transformMetricsToMonthlyData(monthlyMetrics, metrics, monthName);
 
     // Ajouter à l'onglet équipe
-    this.tabs[2].monthlyData!.push(monthlyMetrics);
+    this.tabs[1].monthlyData!.push(monthlyMetrics);
 
     // Retourner les taux totaux pour le dashboard
     return totalRates;
@@ -438,56 +438,73 @@ export class AppComponent implements OnInit {
       ? ((capaciteTheorique - totalCDS.absenceDays - totalCDS.nonAffectedDays - totalCDS.previsionDays) / capaciteReelle) * 100
       : 0;
 
-    // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
+    // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE + COLLAPSE ***
+    const sectionIdTotal = `${monthName}-team-total`;
     monthlyMetrics.data.push({
       col0: 'Taux d\'activité réel (hors prévision)',
       col1: Math.round(tauxReel * 10) / 10 + ' %', // Arrondi à 1 décimale avec %
       isCustomRow: true,
-      isRateRow: true
+      isRateRow: true,
+      isCollapsible: true,
+      sectionId: sectionIdTotal
     });
 
     monthlyMetrics.data.push({
       col0: 'Taux d\'activité estimé (prévision inclus)',
       col1: Math.round(tauxEstime * 10) / 10 + ' %', // Arrondi à 1 décimale avec %
       isCustomRow: true,
-      isRateRow: true
+      isRateRow: true,
+      isDetailRow: true,
+      sectionId: sectionIdTotal
     });
 
     // Lignes de capacité après
     monthlyMetrics.data.push({
       col0: 'Capacité de production théorique',
       col1: capaciteTheorique,
-      isCustomRow: true
+      isCustomRow: true,
+      isDetailRow: true,
+      sectionId: sectionIdTotal
     });
 
     monthlyMetrics.data.push({
       col0: 'Jours Absence : congés/OUT total',
       col1: Math.round(totalCDS.absenceDays * 10) / 10, // Arrondi à 1 décimale
-      isCustomRow: true
+      isCustomRow: true,
+      isDetailRow: true,
+      sectionId: sectionIdTotal
     });
 
     monthlyMetrics.data.push({
       col0: 'Jours interne',
       col1: Math.round(totalCDS.interneDays * 10) / 10, // Arrondi à 1 décimale
-      isCustomRow: true
+      isCustomRow: true,
+      isDetailRow: true,
+      sectionId: sectionIdTotal
     });
 
     monthlyMetrics.data.push({
       col0: 'Jours Non Affecté',
       col1: Math.round(totalCDS.nonAffectedDays * 10) / 10, // Arrondi à 1 décimale
-      isCustomRow: true
+      isCustomRow: true,
+      isDetailRow: true,
+      sectionId: sectionIdTotal
     });
 
     monthlyMetrics.data.push({
       col0: 'Jours Prevision',
       col1: Math.round(totalCDS.previsionDays * 10) / 10, // Arrondi à 1 décimale
-      isCustomRow: true
+      isCustomRow: true,
+      isDetailRow: true,
+      sectionId: sectionIdTotal
     });
 
     monthlyMetrics.data.push({
       col0: 'Capacité de production réelle en jours',
       col1: Math.round(capaciteReelle * 10) / 10, // Arrondi à 1 décimale
-      isCustomRow: true
+      isCustomRow: true,
+      isDetailRow: true,
+      sectionId: sectionIdTotal
     });
 
     // Titre de séparation EQUIPE FRONT
@@ -516,43 +533,56 @@ export class AppComponent implements OnInit {
         ? ((joursAProduireFront - equipeFront.absenceDays - equipeFront.nonAffectedDays - equipeFront.previsionDays) / capaciteReelleFront) * 100
         : 0;
 
-      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
+      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE + COLLAPSE ***
+      const sectionIdFront = `${monthName}-team-front`;
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité réel global',
         col1: Math.round(tauxReelFront * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isCollapsible: true,
+        sectionId: sectionIdFront
       });
 
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité estimé global',
         col1: Math.round(tauxEstimeFront * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdFront
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours à produire Front',
         col1: joursAProduireFront,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdFront
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Absence : congés/OUT Front',
         col1: Math.round(equipeFront.absenceDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdFront
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours non Affecté Front',
         col1: Math.round(equipeFront.nonAffectedDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdFront
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Prevision Front',
         col1: Math.round(equipeFront.previsionDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdFront
       });
     }
 
@@ -582,43 +612,56 @@ export class AppComponent implements OnInit {
         ? ((joursAProduireBack - equipeBack.absenceDays - equipeBack.nonAffectedDays - equipeBack.previsionDays) / capaciteReelleBack) * 100
         : 0;
 
-      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
+      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE + COLLAPSE ***
+      const sectionIdBack = `${monthName}-team-back`;
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité réel global',
         col1: Math.round(tauxReelBack * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isCollapsible: true,
+        sectionId: sectionIdBack
       });
 
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité estimé global',
         col1: Math.round(tauxEstimeBack * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdBack
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours à produire Back',
         col1: joursAProduireBack,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdBack
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Absence : congés/OUT Back',
         col1: Math.round(equipeBack.absenceDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdBack
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours non Affecté Back',
         col1: Math.round(equipeBack.nonAffectedDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdBack
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Prevision Back',
         col1: Math.round(equipeBack.previsionDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdBack
       });
     }
 
@@ -648,43 +691,56 @@ export class AppComponent implements OnInit {
         ? ((joursAProduireCdP - equipeCdP.absenceDays - equipeCdP.nonAffectedDays - equipeCdP.previsionDays) / capaciteReelleCdP) * 100
         : 0;
 
-      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
+      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE + COLLAPSE ***
+      const sectionIdCdP = `${monthName}-team-cdp`;
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité réel global',
         col1: Math.round(tauxReelCdP * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isCollapsible: true,
+        sectionId: sectionIdCdP
       });
 
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité estimé global',
         col1: Math.round(tauxEstimeCdP * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdCdP
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours à produire CdP',
         col1: joursAProduireCdP,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdCdP
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Absence : congés/OUT CdP',
         col1: Math.round(equipeCdP.absenceDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdCdP
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours non Affecté CdP',
         col1: Math.round(equipeCdP.nonAffectedDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdCdP
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Prevision CdP',
         col1: Math.round(equipeCdP.previsionDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdCdP
       });
     }
 
@@ -714,43 +770,56 @@ export class AppComponent implements OnInit {
         ? ((joursAProduireDesign - equipeDesign.absenceDays - equipeDesign.nonAffectedDays - equipeDesign.previsionDays) / capaciteReelleDesign) * 100
         : 0;
 
-      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
+      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE + COLLAPSE ***
+      const sectionIdDesign = `${monthName}-team-design`;
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité réel global',
         col1: Math.round(tauxReelDesign * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isCollapsible: true,
+        sectionId: sectionIdDesign
       });
 
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité estimé global',
         col1: Math.round(tauxEstimeDesign * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdDesign
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours à produire Design',
         col1: joursAProduireDesign,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdDesign
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Absence : congés/OUT Design',
         col1: Math.round(equipeDesign.absenceDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdDesign
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours non Affecté Design',
         col1: Math.round(equipeDesign.nonAffectedDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdDesign
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Prevision Design',
         col1: Math.round(equipeDesign.previsionDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdDesign
       });
     }
 
@@ -781,7 +850,7 @@ export class AppComponent implements OnInit {
     this.transformExpertiseMetricsToMonthlyData(monthlyMetrics, expertiseMetrics, teamMetrics, monthName);
 
     // Ajouter à l'onglet expertise
-    this.tabs[3].monthlyData!.push(monthlyMetrics);
+    this.tabs[2].monthlyData!.push(monthlyMetrics);
   }
 
   transformExpertiseMetricsToMonthlyData(
@@ -896,55 +965,72 @@ export class AppComponent implements OnInit {
         ? ((capaciteTheorique - totalCDS.absenceDays - totalCDS.nonAffectedDays - totalCDS.previsionDays) / capaciteReelle) * 100
         : 0;
 
-      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
+      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE + COLLAPSE ***
+      const sectionIdTotal = `${monthName}-total`;
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité réel (hors prévision)',
         col1: Math.round(tauxReel * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isCollapsible: true,
+        sectionId: sectionIdTotal
       });
 
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité estimé (prévision inclus)',
         col1: Math.round(tauxEstime * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdTotal
       });
 
       monthlyMetrics.data.push({
         col0: 'Capacité de production théorique',
         col1: capaciteTheorique,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdTotal
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Absence : congés/OUT total',
         col1: Math.round(totalCDS.absenceDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdTotal
       });
 
       monthlyMetrics.data.push({
         col0: 'Capacité de production réelle (en jours)',
         col1: Math.round(capaciteReelle * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdTotal
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours interne',
         col1: Math.round(totalCDS.interneDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdTotal
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Non Affecté',
         col1: Math.round(totalCDS.nonAffectedDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdTotal
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Prevision',
         col1: Math.round(totalCDS.previsionDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdTotal
       });
     }
 
@@ -973,43 +1059,56 @@ export class AppComponent implements OnInit {
       // Stocker le taux réel pour le tableau de bord
       dashboardRates.frontEcommerceRate = Math.round(tauxReel * 10) / 10;
 
-      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
+      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE + COLLAPSE ***
+      const sectionId = `${monthName}-front-ecommerce`;
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité réel global',
         col1: Math.round(tauxReel * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isCollapsible: true,
+        sectionId: sectionId
       });
 
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité estimé global',
         col1: Math.round(tauxEstime * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isDetailRow: true,
+        sectionId: sectionId
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours à produire Front',
         col1: joursAProduire,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionId
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Absence : congés/OUT Front',
         col1: Math.round(frontEcommerce.absenceDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionId
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours non Affecté Front',
         col1: Math.round(frontEcommerce.nonAffectedDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionId
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Prevision Front',
         col1: Math.round(frontEcommerce.previsionDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionId
       });
     }
 
@@ -1038,43 +1137,56 @@ export class AppComponent implements OnInit {
       // Stocker le taux réel pour le tableau de bord
       dashboardRates.backEcommerceRate = Math.round(tauxReel * 10) / 10;
 
-      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
+      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE + COLLAPSE ***
+      const sectionIdBack = `${monthName}-back-ecommerce`;
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité réel global',
         col1: Math.round(tauxReel * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isCollapsible: true,
+        sectionId: sectionIdBack
       });
 
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité estimé global',
         col1: Math.round(tauxEstime * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdBack
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours à produire Back',
         col1: joursAProduire,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdBack
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Absence : congés/OUT Back',
         col1: Math.round(backEcommerce.absenceDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdBack
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours non Affecté Back',
         col1: Math.round(backEcommerce.nonAffectedDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdBack
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Prevision Back',
         col1: Math.round(backEcommerce.previsionDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdBack
       });
     }
 
@@ -1103,43 +1215,56 @@ export class AppComponent implements OnInit {
       // Stocker le taux réel pour le tableau de bord
       dashboardRates.frontSurMesureRate = Math.round(tauxReel * 10) / 10;
 
-      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
+      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE + COLLAPSE ***
+      const sectionIdFrontSM = `${monthName}-front-surmesure`;
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité réel global',
         col1: Math.round(tauxReel * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isCollapsible: true,
+        sectionId: sectionIdFrontSM
       });
 
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité estimé global',
         col1: Math.round(tauxEstime * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdFrontSM
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours à produire Front',
         col1: joursAProduire,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdFrontSM
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Absence : congés/OUT Front',
         col1: Math.round(frontSurMesure.absenceDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdFrontSM
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours non Affecté Front',
         col1: Math.round(frontSurMesure.nonAffectedDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdFrontSM
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Prevision Front',
         col1: Math.round(frontSurMesure.previsionDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdFrontSM
       });
     }
 
@@ -1168,43 +1293,56 @@ export class AppComponent implements OnInit {
       // Stocker le taux réel pour le tableau de bord
       dashboardRates.backSurMesureRate = Math.round(tauxReel * 10) / 10;
 
-      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
+      // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE + COLLAPSE ***
+      const sectionIdBackSM = `${monthName}-back-surmesure`;
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité réel global',
         col1: Math.round(tauxReel * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isCollapsible: true,
+        sectionId: sectionIdBackSM
       });
 
       monthlyMetrics.data.push({
         col0: 'Taux d\'activité estimé global',
         col1: Math.round(tauxEstime * 10) / 10 + ' %',
         isCustomRow: true,
-        isRateRow: true
+        isRateRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdBackSM
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours à produire Back',
         col1: joursAProduire,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdBackSM
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Absence : congés/OUT Back',
         col1: Math.round(backSurMesure.absenceDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdBackSM
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours non Affecté Back',
         col1: Math.round(backSurMesure.nonAffectedDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdBackSM
       });
 
       monthlyMetrics.data.push({
         col0: 'Jours Prevision Back',
         col1: Math.round(backSurMesure.previsionDays * 10) / 10,
-        isCustomRow: true
+        isCustomRow: true,
+        isDetailRow: true,
+        sectionId: sectionIdBackSM
       });
     }
 
@@ -1236,7 +1374,7 @@ export class AppComponent implements OnInit {
     this.transformDailyMetricsToMonthlyData(monthlyMetrics, dailyMetrics);
 
     // Ajouter à l'onglet daily
-    this.tabs[4].monthlyData!.push(monthlyMetrics);
+    this.tabs[3].monthlyData!.push(monthlyMetrics);
 
     // Récupérer les taux et projets depuis le cache
     const cached = this.dataCacheService.getMonthData(monthName);
@@ -1266,8 +1404,18 @@ export class AppComponent implements OnInit {
     monthlyMetrics.headers = headers;
     monthlyMetrics.data = [];
 
+    const monthName = monthlyMetrics.month;
+
     // Helper pour créer une ligne
-    const createRow = (label: string, values: (string | number)[], isTitle: boolean = false, isRate: boolean = false): TableRow => {
+    const createRow = (
+      label: string,
+      values: (string | number)[],
+      isTitle: boolean = false,
+      isRate: boolean = false,
+      isCollapsible: boolean = false,
+      isDetailRow: boolean = false,
+      sectionId?: string
+    ): TableRow => {
       const row: TableRow = {
         col0: label,
         isCustomRow: true
@@ -1277,6 +1425,15 @@ export class AppComponent implements OnInit {
       }
       if (isRate) {
         row.isRateRow = true;
+      }
+      if (isCollapsible) {
+        row.isCollapsible = true;
+      }
+      if (isDetailRow) {
+        row.isDetailRow = true;
+      }
+      if (sectionId) {
+        row.sectionId = sectionId;
       }
       values.forEach((value, index) => {
         row[`col${index + 1}`] = value;
@@ -1347,7 +1504,8 @@ export class AppComponent implements OnInit {
     // Section TOTAL
     monthlyMetrics.data.push(createRow('TOTAL', dailyMetrics.map(() => ''), true));
 
-    // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
+    // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE + COLLAPSE ***
+    const sectionIdTotalDaily = `${monthName}-daily-total`;
     // Taux d'activité réel (hors prévision) = (capacité réelle - jours non affecté - jours prévision) / capacité réelle
     monthlyMetrics.data.push(createRow(
       'Taux d\'activité réel (hors prévision)',
@@ -1359,7 +1517,10 @@ export class AppComponent implements OnInit {
         return Math.round(taux * 100) / 100 + '%';
       }),
       false,
-      true
+      true,
+      true,
+      false,
+      sectionIdTotalDaily
     ));
 
     // Taux d'activité estimé (prévision inclus) = (capacité réelle - jours non affecté) / capacité réelle
@@ -1373,19 +1534,32 @@ export class AppComponent implements OnInit {
         return Math.round(taux * 100) / 100 + '%';
       }),
       false,
-      true
+      true,
+      false,
+      true,
+      sectionIdTotalDaily
     ));
 
     // Capacité de production théorique = 1 × nb collab CDS
     monthlyMetrics.data.push(createRow(
       'Capacité de production théorique',
-      dailyMetrics.map(d => 1 * d.totalCDS)
+      dailyMetrics.map(d => 1 * d.totalCDS),
+      false,
+      false,
+      false,
+      true,
+      sectionIdTotalDaily
     ));
 
     // Jours Absence : congés/OUT total (NON cumulatif, uniquement pour cette demi-journée)
     monthlyMetrics.data.push(createRow(
       'Jours Absence : congés/OUT total',
-      dailyMetrics.map(d => d.absences)
+      dailyMetrics.map(d => d.absences),
+      false,
+      false,
+      false,
+      true,
+      sectionIdTotalDaily
     ));
 
     // Capacité de production réelle (en jours) = Capacité théorique - Jours Absence
@@ -1395,31 +1569,52 @@ export class AppComponent implements OnInit {
         const capaciteTheorique = 1 * d.totalCDS;
         const capaciteReelle = capaciteTheorique - d.absences;
         return Math.round(capaciteReelle * 10) / 10;
-      })
+      }),
+      false,
+      false,
+      false,
+      true,
+      sectionIdTotalDaily
     ));
 
     // Jours interne (NON cumulatif)
     monthlyMetrics.data.push(createRow(
       'Jours interne',
-      dailyMetrics.map(d => d.interne)
+      dailyMetrics.map(d => d.interne),
+      false,
+      false,
+      false,
+      true,
+      sectionIdTotalDaily
     ));
 
     // Jours Non Affecté (NON cumulatif)
     monthlyMetrics.data.push(createRow(
       'Jours Non Affecté',
-      dailyMetrics.map(d => d.nonAffected)
+      dailyMetrics.map(d => d.nonAffected),
+      false,
+      false,
+      false,
+      true,
+      sectionIdTotalDaily
     ));
 
     // Jours Prevision (NON cumulatif)
     monthlyMetrics.data.push(createRow(
       'Jours Prevision',
-      dailyMetrics.map(d => d.prevision)
+      dailyMetrics.map(d => d.prevision),
+      false,
+      false,
+      false,
+      true,
+      sectionIdTotalDaily
     ));
 
     // Section Equipe Front E-commerce
     monthlyMetrics.data.push(createRow('EQUIPE FRONT E-COMMERCE', dailyMetrics.map(() => ''), true));
 
-    // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
+    // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE + COLLAPSE ***
+    const sectionIdFrontEcomDaily = `${monthName}-daily-front-ecommerce`;
     monthlyMetrics.data.push(createRow(
       'Taux d\'activité réel global',
       dailyMetrics.map(d => {
@@ -1430,7 +1625,10 @@ export class AppComponent implements OnInit {
         return Math.round(taux * 100) / 100 + '%';
       }),
       false,
-      true
+      true,
+      true,
+      false,
+      sectionIdFrontEcomDaily
     ));
 
     monthlyMetrics.data.push(createRow(
@@ -1443,33 +1641,41 @@ export class AppComponent implements OnInit {
         return Math.round(taux * 100) / 100 + '%';
       }),
       false,
-      true
+      true,
+      false,
+      true,
+      sectionIdFrontEcomDaily
     ));
 
     monthlyMetrics.data.push(createRow(
       'Jours à produire Front',
-      dailyMetrics.map(d => d.frontEcommerce)
+      dailyMetrics.map(d => d.frontEcommerce),
+      false, false, false, true, sectionIdFrontEcomDaily
     ));
 
     monthlyMetrics.data.push(createRow(
       'Demi jours Absence : congés/OUT Front',
-      dailyMetrics.map(d => Math.round(d.frontEcommerceAbsences * 10) / 10)
+      dailyMetrics.map(d => Math.round(d.frontEcommerceAbsences * 10) / 10),
+      false, false, false, true, sectionIdFrontEcomDaily
     ));
 
     monthlyMetrics.data.push(createRow(
       'Demi jours non Affecté Front',
-      dailyMetrics.map(d => Math.round(d.frontEcommerceNonAffected * 10) / 10)
+      dailyMetrics.map(d => Math.round(d.frontEcommerceNonAffected * 10) / 10),
+      false, false, false, true, sectionIdFrontEcomDaily
     ));
 
     monthlyMetrics.data.push(createRow(
       'Demi jours Prevision Front',
-      dailyMetrics.map(d => Math.round(d.frontEcommercePrevision * 10) / 10)
+      dailyMetrics.map(d => Math.round(d.frontEcommercePrevision * 10) / 10),
+      false, false, false, true, sectionIdFrontEcomDaily
     ));
 
     // Section Equipe Back E-commerce
     monthlyMetrics.data.push(createRow('EQUIPE BACK E-COMMERCE', dailyMetrics.map(() => ''), true));
 
-    // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
+    // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE + COLLAPSE ***
+    const sectionIdBackEcomDaily = `${monthName}-daily-back-ecommerce`;
     monthlyMetrics.data.push(createRow(
       'Taux d\'activité réel global',
       dailyMetrics.map(d => {
@@ -1480,7 +1686,10 @@ export class AppComponent implements OnInit {
         return Math.round(taux * 100) / 100 + '%';
       }),
       false,
-      true
+      true,
+      true,
+      false,
+      sectionIdBackEcomDaily
     ));
 
     monthlyMetrics.data.push(createRow(
@@ -1493,33 +1702,41 @@ export class AppComponent implements OnInit {
         return Math.round(taux * 100) / 100 + '%';
       }),
       false,
-      true
+      true,
+      false,
+      true,
+      sectionIdBackEcomDaily
     ));
 
     monthlyMetrics.data.push(createRow(
       'Demi jours à produire Back',
-      dailyMetrics.map(d => d.backEcommerce)
+      dailyMetrics.map(d => d.backEcommerce),
+      false, false, false, true, sectionIdBackEcomDaily
     ));
 
     monthlyMetrics.data.push(createRow(
       'Demi jours Absence : congés/OUT Back',
-      dailyMetrics.map(d => Math.round(d.backEcommerceAbsences * 10) / 10)
+      dailyMetrics.map(d => Math.round(d.backEcommerceAbsences * 10) / 10),
+      false, false, false, true, sectionIdBackEcomDaily
     ));
 
     monthlyMetrics.data.push(createRow(
       'Demi jours non Affecté Back',
-      dailyMetrics.map(d => Math.round(d.backEcommerceNonAffected * 10) / 10)
+      dailyMetrics.map(d => Math.round(d.backEcommerceNonAffected * 10) / 10),
+      false, false, false, true, sectionIdBackEcomDaily
     ));
 
     monthlyMetrics.data.push(createRow(
       'Demi jours Prevision Back',
-      dailyMetrics.map(d => Math.round(d.backEcommercePrevision * 10) / 10)
+      dailyMetrics.map(d => Math.round(d.backEcommercePrevision * 10) / 10),
+      false, false, false, true, sectionIdBackEcomDaily
     ));
 
     // Section Equipe Front Sur mesure
     monthlyMetrics.data.push(createRow('EQUIPE FRONT SUR MESURE', dailyMetrics.map(() => ''), true));
 
-    // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
+    // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE + COLLAPSE ***
+    const sectionIdFrontSMDaily = `${monthName}-daily-front-surmesure`;
     monthlyMetrics.data.push(createRow(
       'Taux d\'activité réel global',
       dailyMetrics.map(d => {
@@ -1530,7 +1747,10 @@ export class AppComponent implements OnInit {
         return Math.round(taux * 100) / 100 + '%';
       }),
       false,
-      true
+      true,
+      true,
+      false,
+      sectionIdFrontSMDaily
     ));
 
     monthlyMetrics.data.push(createRow(
@@ -1543,33 +1763,41 @@ export class AppComponent implements OnInit {
         return Math.round(taux * 100) / 100 + '%';
       }),
       false,
-      true
+      true,
+      false,
+      true,
+      sectionIdFrontSMDaily
     ));
 
     monthlyMetrics.data.push(createRow(
       'Jours à produire Front',
-      dailyMetrics.map(d => d.frontSurMesure)
+      dailyMetrics.map(d => d.frontSurMesure),
+      false, false, false, true, sectionIdFrontSMDaily
     ));
 
     monthlyMetrics.data.push(createRow(
       'Demi jours Absence : congés/OUT Front',
-      dailyMetrics.map(d => Math.round(d.frontSurMesureAbsences * 10) / 10)
+      dailyMetrics.map(d => Math.round(d.frontSurMesureAbsences * 10) / 10),
+      false, false, false, true, sectionIdFrontSMDaily
     ));
 
     monthlyMetrics.data.push(createRow(
       'Demi jours non Affecté Front',
-      dailyMetrics.map(d => Math.round(d.frontSurMesureNonAffected * 10) / 10)
+      dailyMetrics.map(d => Math.round(d.frontSurMesureNonAffected * 10) / 10),
+      false, false, false, true, sectionIdFrontSMDaily
     ));
 
     monthlyMetrics.data.push(createRow(
       'Demi jours Prevision Front',
-      dailyMetrics.map(d => Math.round(d.frontSurMesurePrevision * 10) / 10)
+      dailyMetrics.map(d => Math.round(d.frontSurMesurePrevision * 10) / 10),
+      false, false, false, true, sectionIdFrontSMDaily
     ));
 
     // Section Equipe Back Sur mesure
     monthlyMetrics.data.push(createRow('EQUIPE BACK SUR MESURE', dailyMetrics.map(() => ''), true));
 
-    // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE ***
+    // *** TAUX D'ACTIVITÉ EN PREMIER AVEC STYLE + COLLAPSE ***
+    const sectionIdBackSMDaily = `${monthName}-daily-back-surmesure`;
     monthlyMetrics.data.push(createRow(
       'Taux d\'activité réel global',
       dailyMetrics.map(d => {
@@ -1580,7 +1808,10 @@ export class AppComponent implements OnInit {
         return Math.round(taux * 100) / 100 + '%';
       }),
       false,
-      true
+      true,
+      true,
+      false,
+      sectionIdBackSMDaily
     ));
 
     monthlyMetrics.data.push(createRow(
@@ -1593,27 +1824,34 @@ export class AppComponent implements OnInit {
         return Math.round(taux * 100) / 100 + '%';
       }),
       false,
-      true
+      true,
+      false,
+      true,
+      sectionIdBackSMDaily
     ));
 
     monthlyMetrics.data.push(createRow(
       'Demi jours à produire Back',
-      dailyMetrics.map(d => d.backSurMesure)
+      dailyMetrics.map(d => d.backSurMesure),
+      false, false, false, true, sectionIdBackSMDaily
     ));
 
     monthlyMetrics.data.push(createRow(
       'Demi jours Absence : congés/OUT Back',
-      dailyMetrics.map(d => Math.round(d.backSurMesureAbsences * 10) / 10)
+      dailyMetrics.map(d => Math.round(d.backSurMesureAbsences * 10) / 10),
+      false, false, false, true, sectionIdBackSMDaily
     ));
 
     monthlyMetrics.data.push(createRow(
       'Demi jours non Affecté Back',
-      dailyMetrics.map(d => Math.round(d.backSurMesureNonAffected * 10) / 10)
+      dailyMetrics.map(d => Math.round(d.backSurMesureNonAffected * 10) / 10),
+      false, false, false, true, sectionIdBackSMDaily
     ));
 
     monthlyMetrics.data.push(createRow(
       'Demi jours Prevision Back',
-      dailyMetrics.map(d => Math.round(d.backSurMesurePrevision * 10) / 10)
+      dailyMetrics.map(d => Math.round(d.backSurMesurePrevision * 10) / 10),
+      false, false, false, true, sectionIdBackSMDaily
     ));
   }
 

@@ -36,6 +36,13 @@
   <!-- Tableau des projets -->
   <mat-card class="table-card">
     <mat-card-content>
+      <!-- Barre de recherche -->
+      <mat-form-field class="search-field" appearance="outline">
+        <mat-label>Rechercher un projet</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Nom du projet" [value]="searchText">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
       <div class="table-container">
         <table mat-table [dataSource]="dataSource" matSort class="projects-table">
 

@@ -18,6 +18,11 @@ export class ActivityChartComponent implements OnInit, OnChanges {
 
   insights: string[] = [];
 
+  private readonly COLORS = {
+    PRIMARY: '#1e87f0',
+    SECONDARY: '#f59c16'
+  } as const;
+
   constructor(private activityRateService: ActivityRateService) {}
 
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
@@ -79,23 +84,18 @@ export class ActivityChartComponent implements OnInit, OnChanges {
     // Calculer les taux d'activité pour chaque jour
     const chartData = this.calculateChartData();
 
+    // Créer les datasets avec les couleurs définies
+    this.lineChartData.datasets = [
+      this.createDataset(chartData.data1, chartData.label1, this.COLORS.PRIMARY),
+      this.createDataset(chartData.data2, chartData.label2, this.COLORS.SECONDARY)
+    ];
+
+    // Générer les insights en fonction du type de graphique
     if (this.chartType === 'expertise') {
-      this.lineChartData.datasets = [
-        this.createDataset(chartData.data1, chartData.label1, '#1e87f0'),
-        this.createDataset(chartData.data2, chartData.label2, '#f59c16')
-      ];
       this.insights = this.generateExpertiseInsights(chartData.data1, chartData.data2);
     } else if (this.chartType === 'ecommerce-teams') {
-      this.lineChartData.datasets = [
-        this.createDataset(chartData.data1, chartData.label1, '#1e87f0'),
-        this.createDataset(chartData.data2, chartData.label2, '#f59c16')
-      ];
       this.insights = this.generateTeamInsights('E-commerce', chartData.data1, chartData.data2);
     } else if (this.chartType === 'surmesure-teams') {
-      this.lineChartData.datasets = [
-        this.createDataset(chartData.data1, chartData.label1, '#1e87f0'),
-        this.createDataset(chartData.data2, chartData.label2, '#f59c16')
-      ];
       this.insights = this.generateTeamInsights('Sur mesure', chartData.data1, chartData.data2);
     }
 

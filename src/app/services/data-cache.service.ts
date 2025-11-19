@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ExpertiseMetrics, TeamMetrics, DailyMetrics } from './activity-rate.service';
+import { ExpertiseMetrics, TeamMetrics, DailyMetrics, ActivityRateService } from './activity-rate.service';
 
 export interface ProjectStatistics {
   projectName: string;
@@ -36,6 +36,8 @@ export interface CachedMonthData {
 })
 export class DataCacheService {
   private cache: Map<string, CachedMonthData> = new Map();
+
+  constructor(private activityRateService: ActivityRateService) {}
 
   /**
    * Stocke les données calculées pour un mois
@@ -113,12 +115,14 @@ export class DataCacheService {
 
   /**
    * Récupère toutes les métriques quotidiennes consolidées
+   * Regroupe les demi-journées (Matin + Après-midi) en journées complètes
    */
   getConsolidatedDailyMetrics(): DailyMetrics[] {
-    const allMetrics: DailyMetrics[] = [];
-    this.cache.forEach(data => {
-      allMetrics.push(...data.dailyMetrics);
-    });
-    return allMetrics;
+    const monthlyMetrics = Array.from(this.cache.entries()).map(([month, data]) => ({
+      month,
+      dailyMetrics: data.dailyMetrics
+    }));
+
+    return this.activityRateService.consolidateAllDailyMetrics(monthlyMetrics);
   }
 }

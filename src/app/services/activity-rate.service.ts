@@ -99,6 +99,68 @@ export interface DailyMetrics {
   providedIn: 'root'
 })
 export class ActivityRateService {
+  /**
+   * Vérifie si une date est un jour férié français
+   */
+  private isFrenchHoliday(date: Date): boolean {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // 0-indexed
+    const day = date.getDate();
+
+    // Jours fériés fixes
+    const fixedHolidays = [
+      { month: 1, day: 1 },   // Jour de l'an
+      { month: 5, day: 1 },   // Fête du travail
+      { month: 5, day: 8 },   // Victoire 1945
+      { month: 7, day: 14 },  // Fête nationale
+      { month: 8, day: 15 },  // Assomption
+      { month: 11, day: 1 },  // Toussaint
+      { month: 11, day: 11 }, // Armistice 1918
+      { month: 12, day: 25 }  // Noël
+    ];
+
+    if (fixedHolidays.some(h => h.month === month && h.day === day)) {
+      return true;
+    }
+
+    // Calcul de Pâques (algorithme de Meeus)
+    const a = year % 19;
+    const b = Math.floor(year / 100);
+    const c = year % 100;
+    const d = Math.floor(b / 4);
+    const e = b % 4;
+    const f = Math.floor((b + 8) / 25);
+    const g = Math.floor((b - f + 1) / 3);
+    const h = (19 * a + b - d - g + 15) % 30;
+    const i = Math.floor(c / 4);
+    const k = c % 4;
+    const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    const m = Math.floor((a + 11 * h + 22 * l) / 451);
+    const easterMonth = Math.floor((h + l - 7 * m + 114) / 31);
+    const easterDay = ((h + l - 7 * m + 114) % 31) + 1;
+
+    const easter = new Date(year, easterMonth - 1, easterDay);
+
+    // Lundi de Pâques (Pâques + 1 jour)
+    const easterMonday = new Date(easter);
+    easterMonday.setDate(easter.getDate() + 1);
+
+    // Ascension (Pâques + 39 jours)
+    const ascension = new Date(easter);
+    ascension.setDate(easter.getDate() + 39);
+
+    // Lundi de Pentecôte (Pâques + 50 jours)
+    const pentecoteMonday = new Date(easter);
+    pentecoteMonday.setDate(easter.getDate() + 50);
+
+    // Vérifier si la date correspond à un jour férié mobile
+    const mobileHolidays = [easterMonday, ascension, pentecoteMonday];
+    return mobileHolidays.some(holiday =>
+      holiday.getFullYear() === year &&
+      holiday.getMonth() + 1 === month &&
+      holiday.getDate() === day
+    );
+  }
 
   // Configuration des équipes à suivre
   private teams: TeamConfig[] = [
@@ -505,12 +567,14 @@ export class ActivityRateService {
       // Vérifier si c'est un jour ouvré
       const dayOfWeek = convertedDate.getDay(); // 0 = Dimanche, 6 = Samedi
 
-      // Un jour est ouvré s'il n'est ni samedi ni dimanche
-      const isWorkingDay = dayOfWeek !== 0 && dayOfWeek !== 6;
+      // Un jour est ouvré s'il n'est ni samedi, ni dimanche, ni un jour férié
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+      const isHoliday = this.isFrenchHoliday(convertedDate);
+      const isWorkingDay = !isWeekend && !isHoliday;
 
-      // Skip weekends - ne pas ajouter aux résultats
+      // Skip weekends et jours fériés - ne pas ajouter aux résultats
       if (!isWorkingDay) {
-        colIndex += 2; // Sauter les 2 colonnes du weekend
+        colIndex += 2; // Sauter les 2 colonnes du jour non travaillé
         continue;
       }
 
@@ -1118,7 +1182,9 @@ export class ActivityRateService {
 
       dailyMetrics.forEach(metric => {
         // Modifier la date pour inclure le mois (ex: "01/10/2025 Matin" -> "01 Oct")
-        const dateParts = metric.date.split('/');
+        // Retirer "Matin" ou "Après-midi" de la date
+        const dateWithoutPeriod = metric.date.replace(/ (Matin|Après-midi)$/, '');
+        const dateParts = dateWithoutPeriod.split('/');
         const day = dateParts[0];
         const fullDate = `${day} ${monthShort}`;
 

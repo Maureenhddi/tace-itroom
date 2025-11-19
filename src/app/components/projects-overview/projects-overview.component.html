@@ -1,5 +1,11 @@
 <div class="projects-container">
-  <h2 class="projects-title">Projets - {{ month }}</h2>
+  <div class="projects-header">
+    <h2 class="projects-title">Projets - {{ month }}</h2>
+    <button mat-raised-button color="primary" (click)="exportToExcel()" class="export-button">
+      <mat-icon>file_download</mat-icon>
+      Exporter Excel
+    </button>
+  </div>
 
   <!-- Statistiques globales -->
   <mat-card class="stats-card">

@@ -14,6 +14,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { DataTableComponent } from './components/data-table/data-table.component';
 import { DashboardSummaryComponent, MonthlySummary } from './components/dashboard-summary/dashboard-summary.component';
 import { ProjectsOverviewComponent } from './components/projects-overview/projects-overview.component';
+import { SkeletonLoaderComponent } from './components/skeleton-loader/skeleton-loader.component';
 import { Observable, forkJoin } from 'rxjs';
 import { map, filter } from 'rxjs/operators';
 import { TableRow } from './models/table-data.types';
@@ -50,7 +51,8 @@ interface MonthTab {
     MatTooltipModule,
     DataTableComponent,
     DashboardSummaryComponent,
-    ProjectsOverviewComponent
+    ProjectsOverviewComponent,
+    SkeletonLoaderComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
@@ -252,6 +254,9 @@ export class AppComponent implements OnInit {
 
             // Récupérer toutes les métriques quotidiennes consolidées depuis le cache
             this.consolidatedDailyMetrics = this.dataCacheService.getConsolidatedDailyMetrics();
+
+            // Calculer les tendances mois vs mois précédent
+            this.calculateMonthlyTrends();
 
             tabDashboard.loading = false;
             tabProjets.loading = false;
@@ -1385,7 +1390,8 @@ export class AppComponent implements OnInit {
       totalMetrics: cached.totalRates,
       specificTeamMetrics: cached.expertiseRates,
       projects: cached.projects,
-      projectStats: cached.projectStats
+      projectStats: cached.projectStats,
+      trends: undefined // Sera calculé après tous les mois
     });
   }
 
@@ -1853,6 +1859,34 @@ export class AppComponent implements OnInit {
       dailyMetrics.map(d => Math.round(d.backSurMesurePrevision * 10) / 10),
       false, false, false, true, sectionIdBackSMDaily
     ));
+  }
+
+  /**
+   * Calcule les tendances mois vs mois précédent
+   */
+  calculateMonthlyTrends() {
+    // Parcourir les summaries et calculer les tendances
+    for (let i = 1; i < this.monthlySummaries.length; i++) {
+      const currentMonth = this.monthlySummaries[i];
+      const previousMonth = this.monthlySummaries[i - 1];
+
+      // Calculer les différences en points de pourcentage
+      currentMonth.trends = {
+        realRateTrend: this.calculateTrend(currentMonth.totalMetrics.realRate, previousMonth.totalMetrics.realRate),
+        estimatedRateTrend: this.calculateTrend(currentMonth.totalMetrics.estimatedRate, previousMonth.totalMetrics.estimatedRate),
+        frontEcommerceTrend: this.calculateTrend(currentMonth.specificTeamMetrics.frontEcommerceRate, previousMonth.specificTeamMetrics.frontEcommerceRate),
+        backEcommerceTrend: this.calculateTrend(currentMonth.specificTeamMetrics.backEcommerceRate, previousMonth.specificTeamMetrics.backEcommerceRate),
+        frontSurMesureTrend: this.calculateTrend(currentMonth.specificTeamMetrics.frontSurMesureRate, previousMonth.specificTeamMetrics.frontSurMesureRate),
+        backSurMesureTrend: this.calculateTrend(currentMonth.specificTeamMetrics.backSurMesureRate, previousMonth.specificTeamMetrics.backSurMesureRate)
+      };
+    }
+  }
+
+  /**
+   * Calcule la tendance (différence en points de pourcentage)
+   */
+  private calculateTrend(currentValue: number, previousValue: number): number {
+    return Math.round((currentValue - previousValue) * 10) / 10;
   }
 
   signOut() {

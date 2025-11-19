@@ -1,0 +1,37 @@
+<div class="alerts-panel">
+  @if (alerts.length > 0) {
+    <h2 class="alerts-title">
+      <mat-icon>notifications_active</mat-icon>
+      Alertes & Insights
+    </h2>
+
+    <div class="alerts-list">
+      @for (alert of alerts; track $index) {
+        <mat-card class="alert-card" [ngClass]="getAlertClass(alert.type)">
+          <mat-card-content>
+            <div class="alert-header">
+              <div class="alert-icon">
+                <mat-icon>{{ alert.icon }}</mat-icon>
+              </div>
+              <div class="alert-content">
+                <div class="alert-title-row">
+                  <h3 class="alert-title">{{ alert.title }}</h3>
+                  <mat-chip class="alert-chip" [ngClass]="getAlertClass(alert.type)">
+                    {{ getAlertLabel(alert.type) }}
+                  </mat-chip>
+                </div>
+                <p class="alert-message">{{ alert.message }}</p>
+                <div class="alert-footer">
+                  <span class="alert-month">{{ alert.month }}</span>
+                  @if (alert.value !== undefined) {
+                    <span class="alert-value">{{ alert.value.toFixed(1) }}%</span>
+                  }
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

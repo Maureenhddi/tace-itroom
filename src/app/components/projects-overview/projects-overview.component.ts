@@ -7,7 +7,9 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { ProjectStatistics } from '../../services/activity-rate.service';
+import { ExportService } from '../../services/export.service';
 
 @Component({
   selector: 'app-projects-overview',
@@ -19,7 +21,8 @@ import { ProjectStatistics } from '../../services/activity-rate.service';
     MatSortModule,
     MatFormFieldModule,
     MatInputModule,
-    MatIconModule
+    MatIconModule,
+    MatButtonModule
   ],
   templateUrl: './projects-overview.component.html',
   styleUrl: './projects-overview.component.scss'
@@ -35,6 +38,8 @@ export class ProjectsOverviewComponent implements OnChanges {
   dataSource: MatTableDataSource<ProjectStatistics> = new MatTableDataSource<ProjectStatistics>([]);
 
   searchText: string = '';
+
+  constructor(private exportService: ExportService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['projectStats']) {
@@ -98,5 +103,12 @@ export class ProjectsOverviewComponent implements OnChanges {
       totalCdp: this.projectStats.reduce((sum, p) => sum + p.cdpDays, 0),
       totalDesign: this.projectStats.reduce((sum, p) => sum + p.designDays, 0)
     };
+  }
+
+  /**
+   * Exporte les projets vers Excel
+   */
+  exportToExcel(): void {
+    this.exportService.exportProjectsToExcel(this.projectStats, this.month);
   }
 }

@@ -57,9 +57,16 @@
         @for (tab of tabs; track tab.name; let i = $index) {
           <mat-tab [label]="tab.name">
             @if (tab.loading) {
-              <div style="text-align: center; padding: 2rem;">
-                <mat-spinner></mat-spinner>
-              </div>
+              @if (i === 0) {
+                <!-- Skeleton pour le dashboard -->
+                <app-skeleton-loader type="dashboard" [count]="3"></app-skeleton-loader>
+              } @else if (i === 4) {
+                <!-- Skeleton pour les projets -->
+                <app-skeleton-loader type="table" [count]="5"></app-skeleton-loader>
+              } @else {
+                <!-- Skeleton pour les autres onglets -->
+                <app-skeleton-loader type="table" [count]="5"></app-skeleton-loader>
+              }
             } @else if (i === 0) {
               <!-- Onglet Tableau de bord -->
               <app-dashboard-summary

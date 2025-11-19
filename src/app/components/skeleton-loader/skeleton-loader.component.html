@@ -1,0 +1,75 @@
+<!-- Skeleton pour les cards du dashboard -->
+@if (type === 'dashboard') {
+  <div class="skeleton-dashboard">
+    <div class="skeleton-grid">
+      @for (item of items; track item) {
+        <div class="skeleton-card">
+          <div class="skeleton-card-header"></div>
+          <div class="skeleton-card-content">
+            <div class="skeleton-metric-row">
+              <div class="skeleton-metric"></div>
+              <div class="skeleton-metric"></div>
+            </div>
+            <div class="skeleton-metric-grid">
+              <div class="skeleton-metric-small"></div>
+              <div class="skeleton-metric-small"></div>
+              <div class="skeleton-metric-small"></div>
+              <div class="skeleton-metric-small"></div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}
+
+<!-- Skeleton pour une card simple -->
+@if (type === 'card') {
+  @for (item of items; track item) {
+    <div class="skeleton-card">
+      <div class="skeleton-card-header"></div>
+      <div class="skeleton-card-content">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line skeleton-line-short"></div>
+        <div class="skeleton-line"></div>
+      </div>
+    </div>
+  }
+}
+
+<!-- Skeleton pour les tableaux -->
+@if (type === 'table') {
+  <div class="skeleton-table">
+    <div class="skeleton-table-header">
+      <div class="skeleton-th"></div>
+      <div class="skeleton-th"></div>
+      <div class="skeleton-th"></div>
+      <div class="skeleton-th"></div>
+    </div>
+    @for (item of items; track item) {
+      <div class="skeleton-table-row">
+        <div class="skeleton-td"></div>
+        <div class="skeleton-td"></div>
+        <div class="skeleton-td"></div>
+        <div class="skeleton-td"></div>
+      </div>
+    }
+  </div>
+}
+
+<!-- Skeleton pour les graphiques -->
+@if (type === 'chart') {
+  <div class="skeleton-chart">
+    <div class="skeleton-chart-title"></div>
+    <div class="skeleton-chart-content">
+      <div class="skeleton-chart-bars">
+        <div class="skeleton-bar" style="height: 60%"></div>
+        <div class="skeleton-bar" style="height: 80%"></div>
+        <div class="skeleton-bar" style="height: 45%"></div>
+        <div class="skeleton-bar" style="height: 90%"></div>
+        <div class="skeleton-bar" style="height: 70%"></div>
+        <div class="skeleton-bar" style="height: 55%"></div>
+      </div>
+    </div>
+  </div>
+}

@@ -5,6 +5,7 @@ $itroom-orange: #f59c16;
 $itroom-green: #28a745;
 $itroom-text: #4c4c4c;
 $itroom-text-dark: #333;
+$itroom-text-light: #666;
 $itroom-bg: #fff;
 $itroom-bg-muted: #f8f9fa;
 $itroom-border: #e5e5e5;
@@ -24,6 +25,7 @@ $status-low-border: #f5c6cb;
 $dark-bg: #0f1419;
 $dark-card-bg: #1a1f26;
 $dark-text: #e0e0e0;
+$dark-text-secondary: #b0b0b0;
 $dark-border: #2d3748;
 $dark-shadow: rgba(0, 0, 0, 0.5);
 
@@ -39,16 +41,40 @@ $dark-shadow: rgba(0, 0, 0, 0.5);
   }
 }
 
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  @media (min-width: 768px) {
+    margin-bottom: 2rem;
+  }
+}
+
 .dashboard-title {
   font-size: 1.5rem;
   font-weight: 600;
   color: $itroom-text-dark;
-  margin-bottom: 1.5rem;
-  text-align: center;
+  margin: 0;
 
   @media (min-width: 768px) {
     font-size: 1.75rem;
-    margin-bottom: 2rem;
+  }
+}
+
+.export-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -250,6 +276,42 @@ $dark-shadow: rgba(0, 0, 0, 0.5);
   color: $itroom-text-dark;
 }
 
+.metric-trend {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+
+  mat-icon {
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &.trend-positive {
+    color: $status-good;
+    background: rgba($status-good, 0.1);
+    border: 1px solid rgba($status-good, 0.3);
+  }
+
+  &.trend-negative {
+    color: $status-low;
+    background: rgba($status-low, 0.1);
+    border: 1px solid rgba($status-low, 0.3);
+  }
+
+  &.trend-neutral {
+    color: $itroom-text-light;
+    background: rgba($itroom-text-light, 0.1);
+    border: 1px solid rgba($itroom-text-light, 0.3);
+  }
+}
+
 // Dark theme
 ::ng-deep body.dark-theme {
   .dashboard-title {
@@ -306,6 +368,26 @@ $dark-shadow: rgba(0, 0, 0, 0.5);
 
   .metric-value {
     color: white;
+  }
+
+  .metric-trend {
+    &.trend-positive {
+      color: lighten($status-good, 10%);
+      background: rgba($status-good, 0.2);
+      border-color: rgba($status-good, 0.4);
+    }
+
+    &.trend-negative {
+      color: lighten($status-low, 10%);
+      background: rgba($status-low, 0.2);
+      border-color: rgba($status-low, 0.4);
+    }
+
+    &.trend-neutral {
+      color: $dark-text-secondary;
+      background: rgba($dark-text-secondary, 0.1);
+      border-color: rgba($dark-text-secondary, 0.3);
+    }
   }
 
   // Style spécial pour la section des taux totaux en mode sombre

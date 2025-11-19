@@ -1,0 +1,246 @@
+// Colors
+$itroom-bg-muted: #f8f9fa;
+$skeleton-bg: #e0e0e0;
+$skeleton-bg-dark: #2d3748;
+$skeleton-shimmer: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+$skeleton-shimmer-dark: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+
+// Base skeleton styles
+@mixin skeleton-base {
+  background: $skeleton-bg;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: $skeleton-shimmer;
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+// Dashboard skeleton
+.skeleton-dashboard {
+  padding: 1rem;
+
+  @media (min-width: 768px) {
+    padding: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 2rem;
+  }
+}
+
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1600px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.skeleton-card {
+  @include skeleton-base;
+  background: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  overflow: visible;
+
+  &::after {
+    display: none;
+  }
+}
+
+.skeleton-card-header {
+  @include skeleton-base;
+  height: 80px;
+  border-radius: 12px 12px 0 0;
+  margin-bottom: 1.5rem;
+}
+
+.skeleton-card-content {
+  padding: 1.5rem;
+}
+
+.skeleton-metric-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.skeleton-metric {
+  @include skeleton-base;
+  height: 100px;
+}
+
+.skeleton-metric-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.skeleton-metric-small {
+  @include skeleton-base;
+  height: 80px;
+}
+
+// Card skeleton
+.skeleton-line {
+  @include skeleton-base;
+  height: 16px;
+  margin-bottom: 12px;
+  width: 100%;
+
+  &.skeleton-line-short {
+    width: 60%;
+  }
+}
+
+// Table skeleton
+.skeleton-table {
+  @include skeleton-base;
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+
+  &::after {
+    display: none;
+  }
+}
+
+.skeleton-table-header {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.skeleton-th {
+  @include skeleton-base;
+  height: 24px;
+}
+
+.skeleton-table-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.skeleton-td {
+  @include skeleton-base;
+  height: 20px;
+}
+
+// Chart skeleton
+.skeleton-chart {
+  @include skeleton-base;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+
+  &::after {
+    display: none;
+  }
+}
+
+.skeleton-chart-title {
+  @include skeleton-base;
+  height: 28px;
+  width: 40%;
+  margin-bottom: 2rem;
+}
+
+.skeleton-chart-content {
+  height: 300px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+}
+
+.skeleton-chart-bars {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: 1rem;
+}
+
+.skeleton-bar {
+  @include skeleton-base;
+  flex: 1;
+  min-height: 40%;
+}
+
+// Dark theme
+::ng-deep body.dark-theme {
+  .skeleton-card,
+  .skeleton-table,
+  .skeleton-chart {
+    background: #1a1f26;
+  }
+
+  .skeleton-card-header,
+  .skeleton-metric,
+  .skeleton-metric-small,
+  .skeleton-line,
+  .skeleton-th,
+  .skeleton-td,
+  .skeleton-chart-title,
+  .skeleton-bar {
+    background: $skeleton-bg-dark;
+
+    &::after {
+      background: $skeleton-shimmer-dark;
+    }
+  }
+
+  .skeleton-table-header {
+    border-bottom-color: #2d3748;
+  }
+}
+
+// Responsive
+@media (max-width: 480px) {
+  .skeleton-metric-row,
+  .skeleton-metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .skeleton-table-header,
+  .skeleton-table-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}

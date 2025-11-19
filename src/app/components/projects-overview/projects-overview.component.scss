@@ -30,16 +30,40 @@ $dark-shadow: rgba(0, 0, 0, 0.5);
   }
 }
 
+.projects-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  @media (min-width: 768px) {
+    margin-bottom: 2rem;
+  }
+}
+
 .projects-title {
   font-size: 1.5rem;
   font-weight: 600;
   color: $itroom-text-dark;
-  margin: 0 0 1.5rem 0;
-  text-align: center;
+  margin: 0;
 
   @media (min-width: 768px) {
     font-size: 1.75rem;
-    margin-bottom: 2rem;
+  }
+}
+
+.export-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
   }
 }
 

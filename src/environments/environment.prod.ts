@@ -1,11 +1,10 @@
 export const environment = {
   production: true,
   googleApi: {
-    // En production, utilisez des variables d'environnement injectées lors du build
-    // ou un service de gestion de secrets
-    apiKey: '',  // Votre API Key Google
-    clientId: '',  // Votre Client ID Google
-    spreadsheetId: '',  // ID de votre Google Spreadsheet
+    // Configuration de production
+    apiKey: 'AIzaSyCWSYoObg4h2rePoGDw5dIayNYA4KSeyNM',  // Votre API Key Google
+    clientId: '29902689115-jv17hmg4mhtj5mhshtcdvbd39f6n7esj.apps.googleusercontent.com',  // Votre Client ID Google
+    spreadsheetId: '1TEVv7H7VlKigfLFgi2atOnCfPf3E91GCZAf-n4MfIGs',  // ID de votre Google Spreadsheet
 
     // Configuration de l'API
     discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],

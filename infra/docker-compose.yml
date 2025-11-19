@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   tace-itroom:
     build:
@@ -8,17 +6,17 @@ services:
     container_name: tace-itroom
     restart: unless-stopped
     networks:
-      - traefik
+      - traefik-public
     labels:
       # Enable Traefik for this service
       - "traefik.enable=true"
 
       # HTTP Router
-      - "traefik.http.routers.tace-itroom.rule=Host(`your-domain.com`)"
+      - "traefik.http.routers.tace-itroom.rule=Host(`tace.itroom.fr`)"
       - "traefik.http.routers.tace-itroom.entrypoints=web"
 
       # HTTPS Router (with SSL)
-      - "traefik.http.routers.tace-itroom-secure.rule=Host(`your-domain.com`)"
+      - "traefik.http.routers.tace-itroom-secure.rule=Host(`tace.itroom.fr`)"
       - "traefik.http.routers.tace-itroom-secure.entrypoints=websecure"
       - "traefik.http.routers.tace-itroom-secure.tls=true"
       - "traefik.http.routers.tace-itroom-secure.tls.certresolver=letsencrypt"
@@ -39,5 +37,5 @@ services:
       - "traefik.http.middlewares.tace-itroom-headers.headers.stsPreload=true"
 
 networks:
-  traefik:
+  traefik-public:
     external: true

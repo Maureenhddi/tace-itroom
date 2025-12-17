@@ -48,6 +48,40 @@ export class DashboardSummaryComponent {
   constructor(private exportService: ExportService) {}
 
   /**
+   * Retourne les métriques quotidiennes filtrées pour les 3 prochains mois à partir du mois en cours
+   */
+  get filteredDailyMetrics(): DailyMetrics[] {
+    if (!this.consolidatedDailyMetrics || this.consolidatedDailyMetrics.length === 0) {
+      return [];
+    }
+
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth(); // 0-11
+    const currentYear = currentDate.getFullYear();
+
+    // Calculer la date de fin (3 mois à partir du mois en cours)
+    const endDate = new Date(currentYear, currentMonth + 3, 0); // Dernier jour du 3ème mois
+
+    return this.consolidatedDailyMetrics.filter(metric => {
+      // Parser la date du format "01/10/2025" ou "01/10/2025 Matin"
+      const dateParts = metric.date.split(' ')[0].split('/');
+      if (dateParts.length !== 3) {
+        return false;
+      }
+
+      const day = parseInt(dateParts[0], 10);
+      const month = parseInt(dateParts[1], 10) - 1; // Mois en JavaScript commence à 0
+      const year = parseInt(dateParts[2], 10);
+      const metricDate = new Date(year, month, day);
+
+      // Inclure les dates du mois en cours et des 2 mois suivants
+      const startDate = new Date(currentYear, currentMonth, 1);
+
+      return metricDate >= startDate && metricDate <= endDate;
+    });
+  }
+
+  /**
    * Retourne la classe CSS en fonction du taux d'activité
    * - good: >= 85%
    * - average: 70% - 84%

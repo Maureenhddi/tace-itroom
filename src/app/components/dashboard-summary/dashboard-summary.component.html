@@ -95,24 +95,24 @@
   </div>
 
   <!-- Graphiques consolidés du taux d'activité réel des équipes -->
-  @if (consolidatedDailyMetrics.length > 0) {
+  @if (filteredDailyMetrics.length > 0) {
     <div class="consolidated-charts-section">
-      <h2 class="section-title">Taux d'Activité Réel des Équipes (Tous les mois)</h2>
+      <h2 class="section-title">Taux d'Activité Réel des Équipes (3 prochains mois)</h2>
 
       <app-activity-chart
-        [dailyMetrics]="consolidatedDailyMetrics"
+        [dailyMetrics]="filteredDailyMetrics"
         [chartType]="'expertise'"
         [title]="'Taux d\'activité réel - E-commerce vs Sur mesure'">
       </app-activity-chart>
 
       <app-activity-chart
-        [dailyMetrics]="consolidatedDailyMetrics"
+        [dailyMetrics]="filteredDailyMetrics"
         [chartType]="'ecommerce-teams'"
         [title]="'Taux d\'activité réel E-commerce - Front vs Back'">
       </app-activity-chart>
 
       <app-activity-chart
-        [dailyMetrics]="consolidatedDailyMetrics"
+        [dailyMetrics]="filteredDailyMetrics"
         [chartType]="'surmesure-teams'"
         [title]="'Taux d\'activité réel Sur mesure - Front vs Back'">
       </app-activity-chart>

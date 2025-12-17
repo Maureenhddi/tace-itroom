@@ -49,6 +49,7 @@ export class DashboardSummaryComponent {
 
   /**
    * Retourne les métriques quotidiennes filtrées pour les 3 prochains mois à partir du mois en cours
+   * Si aucune donnée n'est disponible pour les 3 prochains mois, affiche toutes les données
    */
   get filteredDailyMetrics(): DailyMetrics[] {
     if (!this.consolidatedDailyMetrics || this.consolidatedDailyMetrics.length === 0) {
@@ -59,10 +60,11 @@ export class DashboardSummaryComponent {
     const currentMonth = currentDate.getMonth(); // 0-11
     const currentYear = currentDate.getFullYear();
 
-    // Calculer la date de fin (3 mois à partir du mois en cours)
+    // Calculer la date de début et de fin (3 mois à partir du mois en cours)
+    const startDate = new Date(currentYear, currentMonth, 1);
     const endDate = new Date(currentYear, currentMonth + 3, 0); // Dernier jour du 3ème mois
 
-    return this.consolidatedDailyMetrics.filter(metric => {
+    const filtered = this.consolidatedDailyMetrics.filter(metric => {
       // Parser la date du format "01/10/2025" ou "01/10/2025 Matin"
       const dateParts = metric.date.split(' ')[0].split('/');
       if (dateParts.length !== 3) {
@@ -74,11 +76,11 @@ export class DashboardSummaryComponent {
       const year = parseInt(dateParts[2], 10);
       const metricDate = new Date(year, month, day);
 
-      // Inclure les dates du mois en cours et des 2 mois suivants
-      const startDate = new Date(currentYear, currentMonth, 1);
-
       return metricDate >= startDate && metricDate <= endDate;
     });
+
+    // Si aucune donnée filtrée, retourner toutes les données
+    return filtered.length > 0 ? filtered : this.consolidatedDailyMetrics;
   }
 
   /**
